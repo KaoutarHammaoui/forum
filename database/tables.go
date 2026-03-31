@@ -38,7 +38,7 @@ func TableCreation() {
 		user_id INTEGER NOT NULL,
 		post_id INTEGER NOT NULL,
 		content VARCHAR,
-		creted_at TIMESTAMP,
+		created_at TIMESTAMP,
 		FOREIGN KEY(user_id) REFERENCES users(id),
 		FOREIGN KEY(post_id) REFERENCES posts(id)
 	)`,
@@ -64,7 +64,12 @@ func TableCreation() {
 
 	}
 	for _,query:=range queries{
-		_,err:=DB.Exec(query)
+		prep,err:=DB.Prepare(query) //to avoid sql injections
+		if err!=nil{
+			log.Fatal(err)
+		}
+		_,err=prep.Exec()
+
 		if err !=nil{
 			log.Fatal(err)
 		}
