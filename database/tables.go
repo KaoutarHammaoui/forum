@@ -9,7 +9,7 @@ func TableCreation() {
   			username VARCHAR UNIQUE,
   			email VARCHAR UNIQUE,
   			password VARCHAR,
-  			created_at TIMESTAMP
+  			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`,
 
 	`CREATE TABLE IF NOT EXISTS posts(
@@ -17,7 +17,7 @@ func TableCreation() {
 			TITLE VARCHAR,
 			CONTENT TEXT,
 			user_id INTEGER NOT NULL,
-			created_at TIMESTAMP,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (user_id) REFERENCES users(id)
 	)`,
 
@@ -38,12 +38,12 @@ func TableCreation() {
 		user_id INTEGER NOT NULL,
 		post_id INTEGER NOT NULL,
 		content VARCHAR,
-		created_at TIMESTAMP,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY(user_id) REFERENCES users(id),
 		FOREIGN KEY(post_id) REFERENCES posts(id)
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS like(
+	`CREATE TABLE IF NOT EXISTS likes_dislikes(
 		id INTEGER PRIMARY KEY,
 		user_id INTEGER,
 		post_id INTEGER,
