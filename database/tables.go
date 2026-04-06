@@ -43,7 +43,8 @@ func TableCreation() {
 		FOREIGN KEY(post_id) REFERENCES posts(id)
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS likes_dislikes(
+	`CREATE TABLE IF NOT EXISTS likes_dislikes(		id INTEGER PRIMARY KEY,
+
 		id INTEGER PRIMARY KEY,
 		user_id INTEGER,
 		post_id INTEGER,

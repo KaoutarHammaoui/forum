@@ -132,6 +132,67 @@ Index B-Tree → rowid=2 → Table B-Tree → ligne complète
 
 
    
+### Manipulation d file : 
+    donc On a un file.db (sur disque) qui contient une base de données maint on doit manipuler cette db donc on a besoin d'un moteur SQLite  pour lire et ecrire afin d manipuler le fichier via SQL 
+        C/C :   
+            Un fichier + SQLite + SQL = une base complète qui peut lire, écrire et organiser les données sans serveur.
+
+
+### Implementation en GO :
+    Utilisation d'un driver sqlite _ "github.com/mattn/go-sqlite3"
+    ce driver fait le lien entre  interface sqL (database/sql => connaitre juste les commandes sql ) et le moteur sqlite (connait le format d fichier .db SQlite) ce driver traduit ces commandes sql en lecture relles ds file .db 
+    Donc le driver sait lire/écrire physiquement dans le fichier via SQLite et traduit les appels Exec, Query de Go vers la VM SQLite.
+    
+        var DB *sql.DB : pointeur vers un objet sql.DB cet objet represente la base de données entire ds notre code go 
+        
+        sql.Open("sqlite3", "./forumdb") => Prepare un objet ds go , prepare le file mais sans ecrire dedans  
+
+        DB.Ping() => Teste la connexion a la base  (forcer sqlite a ouvrir physiquement le file forum.db) si le fichier n' existe pa sqlite le creer auto + ecrit le header de base ds le file + c est tout debut de la base sur le disque 
+
+        Role d Prepare  :  DB.Prepare([]string)
+            Prepare une requete , car en nrml sqlite doit parser (analyser token+parser ...)chaque requete  a chaque fois avant l execute donc c pour ca  on prépare afin de réutiliser 
+            le driver appeler sqlite3_prepare_v2() :
+                Parsing(analyse syntaxique)AST 
+                Verification des contraintes  
+                Génération du plan d'execution( decider comment exécuter la requete , choisir page B-Tree ou inserer, modifier ect ) ce plan est stocké en mémoire  
+            sql.stmt => prepared statement  : objet plan d execution de requete  
+            prep.Exec() => Executer le Plan 
+
+                RQ: 1️⃣ PRAGMA foreign_keys = ON
+                    Configuration la base  sert a activer le controle des FK car par defaut sont désactivées 
+
+
+        
+## Architecture MVC (Models Views Controllers) : 
+    Est une Architecture qui sépare app en 3 parites ;
+        Model : Gestion des données, logique, acces a la DB
+        View   : Interface Utilisateur
+        Controller : coordonne les actions => recoit les requetes + appelle leModel +retourne view
+
+
+### Models :
+    Apres la creation des tables  ona des données brutes  a chaque fois on récupere un user pr exemple o doit ecrire une requete sql mais ds ce cas  a chaque foit on fait ca le code rendre illisble et repetitif ect donc le role d Model  est  Transforme la table brute en objet manipuable .
+        Mapping Table - > Struct  donc ce cas on manipule la table en go sous forme d'objet en Go 
+        Centraliser la logique Métier  => sql Centraliser ds tous le Model ...
+
+* Il contient plusieurs couches 
+    -Mapping de la table ( chaque model corresond a une table ds la basse de donnees + les attributs du Model représentent les colonnes ses champs)
+    -Relations entre les tables ( Has Many + Belongs To) ce sont des méthodes qui saventt comment récuperer les données liee     
+    -CRUD 
+    Model: User
+        ├─ Table mapping: id, name, email
+        ├─ Relations:
+        │   ├─ Orders (hasMany)
+        │   └─ Profile (hasOne)
+        ├─ CRUD methods:
+        │   ├─ getAll()
+        │   ├─ findByID(id)
+        │   ├─ create(data)
+        │   └─ delete(id)
+        └─ Business logic:
+            ├─ canLogin()
+            ├─ isActive()
+            └─ fullName()
 
 
 
