@@ -4,7 +4,6 @@ import (
 	"errors"
 	"forum/database"
 	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -14,6 +13,7 @@ type Session struct {
 	Token     string
 	ExpiresAt time.Time
 }
+
 //Au niveau d connexion d'un user et verification d email && pass on creer une session pour ce utilisateur afin pour chaque requete on ajoute un middlware qui verifier token qui est passe par navigateur 
 func InsertSession(idUser int) (string, error) {
 	query := "INSERT INTO session (user_id, token, expires_at) VALUES (?, ?, ?)"

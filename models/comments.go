@@ -3,9 +3,9 @@ package models
 import "time"
 
 type Comments struct {
-	id_comment int 
-	user_id int
-	post_id int
+	idComment int 
+	userId int
+	postId int
 	content string
-	created_at time.Time
+	createdAt time.Time
 }
