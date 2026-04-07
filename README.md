@@ -196,3 +196,12 @@ Index B-Tree → rowid=2 → Table B-Tree → ligne complète
 
 
 
+Modifier la base (INSERT / UPDATE / DELETE / Create Table  ) => Exec: db.Exec(query, args...)
+    query : requete SQL 
+    Exec ne retourne jamais des données 
+
+    Insert :
+        INSERT INTO Nom_Table (nom, email, password ) VALUES (?, ?, ?)
+
+        ? : Est un placeholder (emplacement vide ) ; on le utilise pour eviter SQL injection, donc on envoie la requete séparée et les données séparées. 
+
