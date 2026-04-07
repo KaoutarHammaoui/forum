@@ -6,9 +6,9 @@ func TableCreation() {
 	queries := []string{
 	`CREATE TABLE IF NOT EXISTS users(
 			id INTEGER PRIMARY KEY,
-  			username VARCHAR UNIQUE,
-  			email VARCHAR UNIQUE,
-  			password VARCHAR,
+  			username VARCHAR UNIQUE NOT NULL,
+  			email VARCHAR UNIQUE NOT NULL,
+  			password VARCHAR NOT NULL,
   			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`,
 
@@ -44,7 +44,6 @@ func TableCreation() {
 	)`,
 
 	`CREATE TABLE IF NOT EXISTS likes_dislikes(		id INTEGER PRIMARY KEY,
-
 		id INTEGER PRIMARY KEY,
 		user_id INTEGER,
 		post_id INTEGER,

@@ -205,3 +205,40 @@ Modifier la base (INSERT / UPDATE / DELETE / Create Table  ) => Exec: db.Exec(qu
 
         ? : Est un placeholder (emplacement vide ) ; on le utilise pour eviter SQL injection, donc on envoie la requete séparée et les données séparées. 
 
+
+
+### SESSION 
+* Authentification : 
+    lorsque user passe son username & Email => on doit le verifier ds la base OK ou NON 
+    En premier lieu on doit vérifier existance de ce user et valider leur infos email + password (comparaison d hash )
+    Tout est validée donc on a un accés accepté 
+       - on est besoin d'une session pour eviter de reconnecter a chaque requete !!!
+    - SESSION : 
+        est une mémoire temporaitr cote serveur 
+        - Création d Session :
+            serveur va créer une session_id = xyz123
+            stock ds database : session_id => user_id
+            serveur envoie session_id au navigateur pour le garder 
+            requetes suivant le nav envoie a chaque fois au serveur pour verifier 
+
+    - Session(cote serveur) + Cookie(cote client):
+        HTTP est un protocole stateless: chaque requete est indépendante + le serveur oublie tout apres avoir répondu 
+        serveur envoie une cookie au nav 
+            cookie : est un petit fichier stocké au navigateur 
+
+        Token =>
+            Pour chaque user doit contenir  un token qui est unique on doit pas utiliser session_id pour le cookie car peut etre une attaque externe 
+            TOKEN UUID (Universally Unique Identifier)
+                on a 2 méthodes  
+                    UUID version 4 -> Aleatoire:
+                        prend 128 bits aléatoires 
+                        une forme standard  
+
+                    HASH aléatoire 
+                        Prend données aléatoires (TimeStamp + user_id + salt)
+                        Applique SHA256 ou HMAC
+                        RESULT = token unique
+
+            
+            TUUID :
+                
