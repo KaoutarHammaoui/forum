@@ -242,3 +242,21 @@ Modifier la base (INSERT / UPDATE / DELETE / Create Table  ) => Exec: db.Exec(qu
             
             TUUID :
                 
+### Posts :
+    RQ; ds query SELECT pour recupérer plusieurs lignes 
+        result est sousforme d un struct *sql.Rows qui est un curseur (comme pointeur) sur resultat SqL
+        Résultat SQL =
+            [ligne1]
+            [ligne2]
+            [ligne3]
+
+        rows pointe au debut et on avance vc rows.Next()
+            il garde un état interne (position actuelle)
+            il gère le streaming depuis la DB
+            il évite de charger tout en mémoire
+
+
+* Les Jointures  :
+    Inner Join :   recu tous les lignes correspond ds les 2 tables
+        Comment ??? 
+            
