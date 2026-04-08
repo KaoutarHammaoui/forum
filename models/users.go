@@ -1,8 +1,9 @@
 package models
 
 import (
-	"forum/database"
 	"time"
+
+	"forum/database"
 )
 
 type User struct {
@@ -27,7 +28,7 @@ func InsertUser(user User) (int64, error) {
 	return lastId, nil
 }
 
-// Verifier Email et Username si ils sont dupliquée au niveau d registrer un nv user (kuhaku)
+// Verifier Email et Username si ils sont dupliquée au niveau d registrer un nv user (kuuhaku)
 func ExistsInColumn(column, value string) (bool, error) {
 	var count int
 	query := "SELECT COUNT(*) FROM users  WHERE " + column + " = ?"
@@ -38,7 +39,7 @@ func ExistsInColumn(column, value string) (bool, error) {
 	return count > 0, nil
 }
 
-// Au niveau d login on est besoin de check User exists et d'apres ca tu valide email, password, username !!!!! (Kawtar)
+// Au niveau d login on est besoin de check User exists et d'apres ca tu valide email, password, username !!!!! (Kaoutar)
 func GetUserByEmail(email string) (User, error) {
 	payload := User{}
 	query := "SELECT id, username, email, password FROM users  WHERE email = ?"
@@ -49,9 +50,9 @@ func GetUserByEmail(email string) (User, error) {
 	return payload, nil
 }
 
-//on est besoin de cette func au niveau  :
-	//Verification d utilisateur est il connecté a une relation au niveau d session 
-	//Affichage d Posts ....
+// on est besoin de cette func au niveau  :
+// Verification d utilisateur est il connecté a une relation au niveau d session
+// Affichage d Posts ....
 func GetUserByID(id int) (User, error) {
 	payload := User{}
 	query := "SELECT id, username, email, password, created_at  FROM users  WHERE id = ?"

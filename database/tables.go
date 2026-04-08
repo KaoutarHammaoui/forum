@@ -4,7 +4,7 @@ import "log"
 
 func TableCreation() {
 	queries := []string{
-	`CREATE TABLE IF NOT EXISTS users(
+		`CREATE TABLE IF NOT EXISTS users(
 			id INTEGER PRIMARY KEY,
   			username VARCHAR UNIQUE NOT NULL,
   			email VARCHAR UNIQUE NOT NULL,
@@ -12,7 +12,7 @@ func TableCreation() {
   			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS posts(
+		`CREATE TABLE IF NOT EXISTS posts(
 			id INTEGER PRIMARY KEY,
 			TITLE VARCHAR,
 			CONTENT TEXT,
@@ -21,19 +21,19 @@ func TableCreation() {
 			FOREIGN KEY (user_id) REFERENCES users(id)
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS category(
+		`CREATE TABLE IF NOT EXISTS category(
 		id INTEGER PRIMARY KEY,
 		name VARCHAR NOT NULL
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS post_category(
+		`CREATE TABLE IF NOT EXISTS post_category(
 		post_id INTEGER ,
 		category_id INTEGER,
 		FOREIGN KEY(post_id) REFERENCES posts(id),
 		FOREIGN KEY (category_id) REFERENCES category(id)
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS comments(
+		`CREATE TABLE IF NOT EXISTS comments(
 		id INTEGER PRIMARY KEY,
 		user_id INTEGER NOT NULL,
 		post_id INTEGER NOT NULL,
@@ -43,7 +43,7 @@ func TableCreation() {
 		FOREIGN KEY(post_id) REFERENCES posts(id)
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS likes_dislikes(		id INTEGER PRIMARY KEY,
+		`CREATE TABLE IF NOT EXISTS likes_dislikes(		id INTEGER PRIMARY KEY,
 		id INTEGER PRIMARY KEY,
 		user_id INTEGER,
 		post_id INTEGER,
@@ -54,23 +54,21 @@ func TableCreation() {
 		FOREIGN KEY (comment_id) REFERENCES comments(id)
 	)`,
 
-	`CREATE TABLE IF NOT EXISTS session(
+		`CREATE TABLE IF NOT EXISTS session(
 		id INTEGER PRIMARY KEY,
 		user_id INTEGER,
 		token VARCHAR UNIQUE NOT NULL,
 		expires_at TIMESTAMP NOT NULL,
 		FOREIGN KEY (user_id) REFERENCES users(id)
 	)`,
-
 	}
-	for _,query:=range queries{
-		prep,err:=DB.Prepare(query) //to avoid sql injections
-		if err!=nil{
+	for _, query := range queries {
+		prep, err := DB.Prepare(query) // to avoid sql injections
+		if err != nil {
 			log.Fatal(err)
 		}
-		_,err=prep.Exec()
-
-		if err !=nil{
+		_, err = prep.Exec()
+		if err != nil {
 			log.Fatal(err)
 		}
 	}
