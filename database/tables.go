@@ -14,23 +14,24 @@ func TableCreation() {
 
 		`CREATE TABLE IF NOT EXISTS posts(
 			id INTEGER PRIMARY KEY,
-			TITLE VARCHAR,
-			CONTENT TEXT,
+			title VARCHAR,
+			content TEXT,
 			user_id INTEGER NOT NULL,
+			image TEXT, 
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY (user_id) REFERENCES users(id)
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 	)`,
 
 		`CREATE TABLE IF NOT EXISTS category(
-		id INTEGER PRIMARY KEY,
-		name VARCHAR NOT NULL
+			id INTEGER PRIMARY KEY,
+			name VARCHAR NOT NULL
 	)`,
 
 		`CREATE TABLE IF NOT EXISTS post_category(
-		post_id INTEGER ,
-		category_id INTEGER,
-		FOREIGN KEY(post_id) REFERENCES posts(id),
-		FOREIGN KEY (category_id) REFERENCES category(id)
+			post_id INTEGER ,
+			category_id INTEGER,
+			FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+			FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
 	)`,
 
 		`CREATE TABLE IF NOT EXISTS comments(
@@ -39,19 +40,19 @@ func TableCreation() {
 		post_id INTEGER NOT NULL,
 		content VARCHAR,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY(user_id) REFERENCES users(id),
-		FOREIGN KEY(post_id) REFERENCES posts(id)
+		FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+		FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE
 	)`,
 
-		`CREATE TABLE IF NOT EXISTS likes_dislikes(		id INTEGER PRIMARY KEY,
+		`CREATE TABLE IF NOT EXISTS likes_dislikes(		
 		id INTEGER PRIMARY KEY,
 		user_id INTEGER,
 		post_id INTEGER,
 		comment_id INTEGER,
 		type 	TEXT NOT NULL CHECK(type IN ('like','dislike')),
-		FOREIGN KEY(user_id) REFERENCES users(id),
-		FOREIGN KEY(post_id) REFERENCES posts(id),
-		FOREIGN KEY (comment_id) REFERENCES comments(id)
+		FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+		FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+		FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
 	)`,
 
 		`CREATE TABLE IF NOT EXISTS session(
@@ -59,7 +60,7 @@ func TableCreation() {
 		user_id INTEGER,
 		token VARCHAR UNIQUE NOT NULL,
 		expires_at TIMESTAMP NOT NULL,
-		FOREIGN KEY (user_id) REFERENCES users(id)
+		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 	)`,
 	}
 	for _, query := range queries {
