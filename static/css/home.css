@@ -7,6 +7,7 @@ body {
     background-repeat: no-repeat;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
+
 }
 
 .container {
@@ -19,6 +20,7 @@ body {
     transform: translate(-50%, -50%); 
     background: rgba(248, 251, 255, 0.041);   
     backdrop-filter: blur(10px) saturate(0.9);
+
     -webkit-backdrop-filter: blur(16px) saturate(2.8); 
     border-radius: 14px;
     padding: 20px;
@@ -107,4 +109,5 @@ body {
     width: 75%;
     height: 100%;
     border-radius: 10px;
+
 }
