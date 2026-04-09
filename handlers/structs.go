@@ -3,6 +3,6 @@ package handlers
 type Login struct {
 	Email      string
 	EmailError string
-	PassError  string
+	PasswordError  string
 	HasErrors  bool
 }
