@@ -18,9 +18,8 @@ func DBinit(){
         log.Fatal(err)
 		
 	}
+	DB.Exec("PRAGMA foreign_keys = ON")
+
 	TableCreation()
-	_,err=DB.Exec("PRAGMA foreign_keys = ON")
-	if err!=nil{
-		log.Fatal(err)
-	}
+
 }
