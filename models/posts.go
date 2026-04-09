@@ -15,7 +15,7 @@ type Post struct {
 	UserName  string
 	CreatedAt time.Time
 }
-
+// A changer :!!!
 func InsertPost(post Post) (int64, error) {
 	query := "INSERT INTO posts (title, content, user_id, image) VALUES (?, ?, ?, ?)"
 	result, err := database.DB.Exec(query, post.Title, post.Content, post.UserId, post.Image)

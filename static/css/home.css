@@ -1,0 +1,110 @@
+body {
+    margin: 0;
+    min-height: 100vh;
+    background-image: url(Photo\ Backdrops\ •\ UK\ •\ Vinyl\ Photo\ Backdrops\ •\ \ Food\ Photography\ Backdrops\ •\ Photo\ Backdrops\ UK\ from\ Capture\ by\ Lucy.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.container {
+    width: 90%;
+    max-width: 1800px;
+    height: 85vh;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    background: rgba(248, 251, 255, 0.041);   
+    backdrop-filter: blur(10px) saturate(0.9);
+    -webkit-backdrop-filter: blur(16px) saturate(2.8); 
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+} 
+
+/* Logo sophistiqué et mémorable */
+.logo {
+    display: inline-block;
+    position: relative;
+    padding: 10px 15px;
+}
+
+.logo p {
+  font-family: "Pacifico", cursive;
+    font-size: 28px;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 2px;
+    color: #F5EEEA;
+    position: relative;
+    z-index: 2;
+}
+
+/* Accent géométrique derrière le texte */
+.logo::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    width: 105px;
+    height: 40px;
+    background: linear-gradient(120deg, 
+        rgba(196, 30, 58, 0.12) 0%, 
+        rgba(196, 30, 58, 0.08) 100%
+    );
+    border-radius: 25px;
+    z-index: 1;
+}
+
+/* Petit cercle signature */
+.logo::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    background: #F5EEEA;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(196, 30, 58, 0.4);
+    z-index: 3;
+}
+
+/* Soulignement élégant */
+.logo p::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 35px;
+    height: 2px;
+    background: linear-gradient(90deg, #F5EEEA 0%, transparent 100%);
+    border-radius: 2px;
+}
+.main {
+    width: 100%;
+    height: calc(100% - 60px); /* laisse de la place au header */
+    display: flex;
+    gap: 20px; /* espace entre les blocs */
+    margin-top: 20px;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #F5EEEA;
+    width: 25%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+/* Content */
+.main-content {
+    background-color: #F5EEEA;
+    width: 75%;
+    height: 100%;
+    border-radius: 10px;
+}
