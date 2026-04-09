@@ -48,6 +48,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		data.PassError="error i pass"
 		data.HasErrors=true
 		renderLogin(w,data)
+		
 		return
 	}
 
@@ -68,6 +69,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogOUT(w http.ResponseWriter, r *http.Request){
+	
 	cookie,err:=r.Cookie("token")
 
 	if err==nil{
@@ -92,4 +94,5 @@ func renderLogin(w http.ResponseWriter, data Login) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl.Execute(w, data)
+	
 }
