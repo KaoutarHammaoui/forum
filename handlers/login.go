@@ -16,13 +16,22 @@ func LoginH(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+	data:=Login{}
+	switch r.URL.Query().Get("error"){
+	case "email":
+		data.EmailError="No account found with this email"
+		data.HasErrors=true
+	case "password"	:
+		data.PasswordError="incorrect password"
+		data.HasErrors=true
+	}
 
 	tmpl := config.GetTemplate("login.html")
 	if tmpl == nil {
-		http.Error(w, "", http.StatusUnauthorized)
+		http.Error(w, "tmpl not found", http.StatusUnauthorized)
 		return
 	}
-	tmpl.ExecuteTemplate(w,"login.html", data)
+	tmpl.ExecuteTemplate(w,"login.html",data)
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
