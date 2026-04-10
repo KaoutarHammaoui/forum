@@ -14,6 +14,9 @@ const UserIdKey contextKey = "userID"
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		//prevent browser to store  
+		w.Header().Set("Cache-Control","no-store,no-cache,must-revalidate, private")
+		w.Header().Set("Pragma","no-cache")
 		cookie, err := r.Cookie("token")
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
