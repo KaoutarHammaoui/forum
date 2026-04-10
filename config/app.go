@@ -2,6 +2,7 @@ package config
 
 import (
 	"forum/database"
+	"log"
 )
 
 func Init() {
@@ -9,4 +10,7 @@ func Init() {
 	database.DBinit()
 	LoadAssets()
 	TemplateParse()
+	if err := TemplateParse();err!=nil{
+		log.Fatal("failed",err)
+	}
 }
