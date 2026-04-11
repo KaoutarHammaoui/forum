@@ -1,7 +1,7 @@
 body {
     margin: 0;
     min-height: 100vh;
-    background-image: url(_.jpeg);
+    background-image: url(Blue\ etheral\ art.jpg);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -140,8 +140,40 @@ header {
     transition: background 0.2s;
 }
 
-.user:hover {
-    background: rgba(245, 238, 234, 0.12);
+/* ===== AUTH LINKS ===== */
+
+.auth-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background .2s, color .2s, transform .15s;
+}
+
+.login-link {
+    background: rgba(245, 238, 234, 0.15);
+    color: #F5EEEA;
+    border: 1px solid rgba(245, 238, 234, 0.3);
+}
+
+.login-link:hover {
+    background: rgba(245, 238, 234, 0.28);
+    transform: translateY(-1px);
+}
+
+.register-link {
+    background: #F5EEEA;
+    color: rgb(0, 36, 46);
+    border: 1px solid rgba(196, 30, 58, 0.4);
+}
+
+.register-link:hover {
+background: #F5EEEA;
+    transform: translateY(-1px);
 }
 
 .user img {
