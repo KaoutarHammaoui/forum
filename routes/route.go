@@ -15,14 +15,8 @@ func Route() {
 	//logout
 	http.HandleFunc("/logout", handlers.LogOUT)
 
-
-
 	http.HandleFunc("/homeUser", middleware.AuthMiddleware(handlers.HomeUser))
 	http.HandleFunc("/register", handlers.RegisterHandler)
 	http.HandleFunc("/do-register", handlers.DoRegisterHandler)
-
-	
-
-
 
 }

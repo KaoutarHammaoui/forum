@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"fmt"
 	"forum/config"
 	"forum/models"
 	"net/http"
 	"strings"
 	"time"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -63,14 +65,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		Expires:  time.Now().Add(1 * time.Hour),
 		HttpOnly: true,
-		Path:     "/homeUser",
+		Path:     "/",
 	})
 	http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
 }
 
 func LogOUT(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
-
+	fmt.Println(r.Cookies())
+	fmt.Println("TEST")
+	fmt.Println(err)
 	if err == nil {
 		models.DeleteSessionByToken(cookie.Value)
 	}

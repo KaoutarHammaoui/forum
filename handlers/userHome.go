@@ -25,6 +25,8 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("TEST HOME USER")
+
 	if r.Method == http.MethodPost {
 		handleCreatePost(w, r)
 		return
@@ -34,13 +36,11 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 
-	// 1. Parse du formulaire multipart (10 MB max)
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
-	// 2. Récupération et validation des champs obligatoires
 	title := strings.TrimSpace(r.FormValue("title"))
 	content := strings.TrimSpace(r.FormValue("content"))
 	categories := r.Form["categories"]
