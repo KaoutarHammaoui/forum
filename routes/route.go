@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"forum/handlers"
+	"forum/middleware"
 )
 
 func Route() {
@@ -15,9 +16,8 @@ func Route() {
 	http.HandleFunc("/logout", handlers.LogOUT)
 
 
-	
-	http.HandleFunc("/homeUser", handlers.HomeUser)
-	//http.HandleFunc("/", handlers.HomeUser)
+
+	http.HandleFunc("/homeUser", middleware.AuthMiddleware(handlers.HomeUser))
 	http.HandleFunc("/register", handlers.RegisterHandler)
 	http.HandleFunc("/do-register", handlers.DoRegisterHandler)
 
