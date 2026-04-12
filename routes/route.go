@@ -1,14 +1,25 @@
 package routes
 
 import (
+	"net/http"
+
 	"forum/handlers"
 	"forum/middleware"
-	"net/http"
 )
 
 func Route() {
 	http.HandleFunc("/register", handlers.RegisterHandler)
 	http.HandleFunc("/do-register", handlers.DoRegisterHandler)
-	http.Handle("/comment", middleware.AuthMiddleware(http.HandlerFunc(handlers.AddCommentHandler)))
-	http.Handle("/react", middleware.AuthMiddleware(http.HandlerFunc(handlers.ReactionHandler)))
+
+	//login routes
+	http.HandleFunc("/login",handlers.LoginH)
+	http.HandleFunc("/do-login",handlers.LoginHandler)
+	//logout
+	http.HandleFunc("/logout",handlers.LogOUT)
+
+	// http.HandleFunc("/",handlers.HomeHAndler)
+	//middleware
+	http.HandleFunc("/",middleware.AuthMiddleware(handlers.HomeHAndler))
+	//also in creating posts
+
 }
