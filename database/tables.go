@@ -84,7 +84,9 @@ func TableCreation() {
 		`INSERT OR IGNORE INTO category (id, name) VALUES
 		(1, 'Technologie'),
 		(2, 'Science'),
-		(3, 'Art')`,
+		(3, 'Art'),
+		(4, 'Music')`,
+		
 	}
 
 	// INSERT DATA

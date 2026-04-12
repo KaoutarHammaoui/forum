@@ -9,24 +9,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
-
-type Data struct {
-	Posts      []models.Post
-	Categories []models.Category
-	Error      string
-}
 
 func HomeUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet && r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
-	fmt.Println("TEST HOME USER")
-
 	if r.Method == http.MethodPost {
 		handleCreatePost(w, r)
 		return
@@ -35,16 +27,13 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
-
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
-
 	title := strings.TrimSpace(r.FormValue("title"))
 	content := strings.TrimSpace(r.FormValue("content"))
 	categories := r.Form["categories"]
-
 	if title == "" || content == "" || categories == nil {
 		//
 		return
@@ -53,8 +42,6 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		//
 		return
 	}
-
-	// 3. Upload image (optionnel)
 	imagePath, err := handleImageUpload(r)
 	if err != nil {
 		//
@@ -76,26 +63,21 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		//
 	}
-	// 5. Liaison post ↔ catégories (récupération de l'id par le nom)
-	for _, catName := range categories {
-		cat, err := models.GetCategoryByName(catName)
+	for _, catIDStr := range categories {
+		catID, err := strconv.Atoi(catIDStr)
+
 		if err != nil {
-			continue
+			return
 		}
-		if err := models.InsertPostCategory(postID, cat.IdCat); err != nil {
-			continue
+		if err := models.InsertPostCategory(postID, catID); err != nil {
+			return
 		}
 	}
-
-	// 6. Redirect POST → GET (pattern PRG)
 	http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 func handleGetHome(w http.ResponseWriter, r *http.Request) {
 	data := Data{}
-
 	categories, err := models.GetAllCategory()
 	if err != nil {
 		http.Error(w, "Error loading categories", http.StatusInternalServerError)
@@ -113,33 +95,27 @@ func handleGetHome(w http.ResponseWriter, r *http.Request) {
 	config.RenderTemplate(w, "homeUser.html", data)
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-
-// handleImageUpload gère l'upload et retourne le chemin relatif, ou "" si absent.
 func handleImageUpload(r *http.Request) (string, error) {
 	file, handler, err := r.FormFile("image")
 	if err != nil {
-		// champ absent ou vide → pas d'image, pas d'erreur
 		return "", nil
 	}
 	defer file.Close()
 
-	// Extensions autorisées
 	ext := strings.ToLower(filepath.Ext(handler.Filename))
 	allowed := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
 	if !allowed[ext] {
 		return "", fmt.Errorf("format non supporté (%s)", ext)
 	}
 
-	// Dossier uploads
 	uploadDir := "uploads"
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		return "", err
 	}
-
-	// Nom unique pour éviter les collisions
 	uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(handler.Filename))
+	fmt.Println(uniqueName)
 	dst := filepath.Join(uploadDir, uniqueName)
+	fmt.Println(dst)
 
 	out, err := os.Create(dst)
 	if err != nil {
@@ -150,6 +126,5 @@ func handleImageUpload(r *http.Request) (string, error) {
 	if _, err := io.Copy(out, file); err != nil {
 		return "", err
 	}
-
-	return dst, nil
+	return strings.ReplaceAll(filepath.Join(uploadDir, uniqueName), "\\", "/"), nil
 }

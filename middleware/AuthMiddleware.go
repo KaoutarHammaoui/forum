@@ -20,7 +20,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 		cookie, err := r.Cookie("token")
 		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
