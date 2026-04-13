@@ -44,6 +44,7 @@ func GetCategoryByName(name string) (Category, error) {
 	}
 	return category, nil
 }
+
 func InsertPostCategory(postID int64, categoryID int) error {
 	_, err := database.DB.Exec("INSERT INTO post_category (post_id, category_id) VALUES (?, ?)", postID, categoryID)
 	return err

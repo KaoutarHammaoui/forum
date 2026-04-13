@@ -113,7 +113,6 @@ func handleImageUpload(r *http.Request) (string, error) {
 		return "", err
 	}
 	uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(handler.Filename))
-	fmt.Println(uniqueName)
 	dst := filepath.Join(uploadDir, uniqueName)
 	fmt.Println(dst)
 
