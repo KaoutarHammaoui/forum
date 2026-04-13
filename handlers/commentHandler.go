@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"forum/middleware"
 	"forum/models"
 )
 
@@ -13,9 +14,13 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.Context().Value("user_id").(int)
+	userID := r.Context().Value(middleware.UserIdKey).(int)
 
-	postID, _ := strconv.Atoi(r.FormValue("post_id"))
+	postID, err := strconv.Atoi(r.FormValue("post_id"))
+	if err != nil {
+		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		return
+	}
 	content := r.FormValue("content")
 
 	if content == "" {
@@ -23,7 +28,7 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := models.CreateComment(userID, postID, content)
+	err = models.CreateComment(userID, postID, content)
 	if err != nil {
 		http.Error(w, "Error creating comment", http.StatusInternalServerError)
 		return

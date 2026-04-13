@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"forum/middleware"
 	"forum/models"
 )
 
@@ -13,18 +14,26 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.Context().Value("user_id").(int)
+	userID := r.Context().Value(middleware.UserIdKey).(int)
 
-	postID, _ := strconv.Atoi(r.FormValue("post_id"))
-	commentID, _ := strconv.Atoi(r.FormValue("comment_id"))
-	reactionType := r.FormValue("type") // like or dislike
+	postID, err := strconv.Atoi(r.FormValue("post_id"))
+	if err != nil {
+		http.Error(w, "Invalid post_id", http.StatusBadRequest)
+		return
+	}
+
+	commentID, err := strconv.Atoi(r.FormValue("comment_id"))
+	if err != nil {
+		commentID = 0
+	}
+	reactionType := r.FormValue("type")
 
 	if reactionType != "like" && reactionType != "dislike" {
 		http.Error(w, "Invalid reaction", http.StatusBadRequest)
 		return
 	}
 
-	err := models.AddReaction(userID, postID, commentID, reactionType)
+	err = models.AddReaction(userID, postID, commentID, reactionType)
 	if err != nil {
 		http.Error(w, "Error reaction", http.StatusInternalServerError)
 		return
