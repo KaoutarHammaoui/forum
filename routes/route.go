@@ -20,6 +20,8 @@ func Route() {
 	// http.HandleFunc("/",handlers.HomeHAndler)
 	//middleware
 	http.HandleFunc("/",middleware.AuthMiddleware(handlers.HomeHAndler))
+	http.HandleFunc("/add-comment", middleware.AuthMiddleware(handlers.AddCommentHandler))
+	http.HandleFunc("/react", middleware.AuthMiddleware(handlers.ReactionHandler))
 	//also in creating posts
 
 }

@@ -49,6 +49,10 @@ func TableCreation() {
 		post_id INTEGER,
 		comment_id INTEGER,
 		type 	TEXT NOT NULL CHECK(type IN ('like','dislike')),
+		
+		UNIQUE(user_id, post_id),
+		UNIQUE(user_id, comment_id),
+
 		FOREIGN KEY(user_id) REFERENCES users(id),
 		FOREIGN KEY(post_id) REFERENCES posts(id),
 		FOREIGN KEY (comment_id) REFERENCES comments(id)
