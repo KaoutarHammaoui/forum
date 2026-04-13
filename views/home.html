@@ -71,8 +71,12 @@
                 {{ range .Posts }}
                 <div class="post-card">
                     <div class="post-header">
-                        <div class="post-avatar">{{ slice .UserName 0 1 }}</div>
-                        <div class="post-meta">
+                        <div class="post-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="8" r="3.5" fill="currentColor" opacity="0.9"/>
+                                <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
+                            </svg>
+                        </div>                        <div class="post-meta">
                             <span class="post-author">{{ .UserName }}</span>
                             <span class="post-date">{{ .CreatedAt.Format "02 Jan 2006" }}</span>
                         </div>
@@ -82,9 +86,17 @@
                     <img class="post-image" src="/{{ .Image }}" alt="post image">
                     {{ end }}
 
-                    <div class="post-body">
+                   <div class="post-body">
                         <h3 class="post-title">{{ .Title }}</h3>
+                        <input type="checkbox" class="excerpt-toggle" id="toggle-{{ .IdPost }}">
                         <p class="post-excerpt">{{ .Content }}</p>
+                        <label class="see-more-btn" for="toggle-{{ .IdPost }}">
+                            <span class="label-more">Voir plus</span>
+                            <span class="label-less">Voir moins</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </label>
                     </div>
 
                 

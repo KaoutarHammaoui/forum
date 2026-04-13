@@ -11,8 +11,8 @@ body {
 
 .container {
     width: 100%;
-    max-width: 1600px;
-    height: 88vh;
+    max-width: 1700px;
+    height: 90vh;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -41,7 +41,7 @@ header {
     font-family: "Pacifico", cursive;
     font-size: 26px;
     font-weight: 400;
-    color: #F5EEEA;
+    color: whitesmoke;
     letter-spacing: 1px;
 }
 
@@ -53,7 +53,7 @@ header {
     border: none;
     border-radius: 24px;
     background: rgba(245, 238, 234, 0.13);
-    color: #F5EEEA;
+    color: whitesmoke;
     font-size: 13.5px;
     font-family: 'DM Sans', sans-serif;
     outline: none;
@@ -83,13 +83,13 @@ header {
 
 .login-link {
     background: rgba(245, 238, 234, 0.12);
-    color: #F5EEEA;
+    color: whitesmoke;
     border: 1px solid rgba(245, 238, 234, 0.25);
 }
 .login-link:hover { background: rgba(245, 238, 234, 0.22); }
 
 .register-link {
-    background: #F5EEEA;
+    background: whitesmoke;
     color: #002d47;
     border: 1px solid transparent;
     font-weight: 600;
@@ -215,7 +215,7 @@ header {
     width: 100%;
     padding: 10px;
     background: #002d47;
-    color: #F5EEEA;
+    color: whitesmoke;
     border: none;
     border-radius: 10px;
     font-size: 13px;
@@ -290,19 +290,21 @@ header {
 }
 
 .post-avatar {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #002d47, #00588c);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
+    background: rgba(0, 45, 71, 0.07);
+    border: 1.5px solid rgba(0, 45, 71, 0.1);
+    color: rgba(0, 45, 71, 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+}
+
+.post-avatar svg {
+    width: 20px;
+    height: 20px;
 }
 
 .post-meta {
@@ -325,7 +327,9 @@ header {
 }
 
 .post-image {
-    width: 100%;
+    display:block;
+    margin: 0 auto;
+    width: 80%;
     height: 200px;
     object-fit: cover;
     border-radius: 9px;
@@ -339,21 +343,25 @@ header {
     color: #0d1b2b;
     line-height: 1.35;
 }
+.excerpt-toggle {
+    display: none;
+}
 
-/* ── VOIR PLUS ── */
 .post-excerpt {
     font-size: 13.5px;
     color: #555;
     line-height: 1.65;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    transition: max-height 0.3s ease;
 }
-.post-excerpt.expanded {
+
+/* Quand la checkbox est cochée → texte complet */
+.excerpt-toggle:checked ~ .post-excerpt {
     display: block;
     overflow: visible;
+    -webkit-line-clamp: unset;
 }
 
 .see-more-btn {
@@ -361,24 +369,29 @@ header {
     align-items: center;
     gap: 4px;
     align-self: flex-start;
-    background: none;
-    border: none;
     color: #002d47;
     font-size: 12.5px;
     font-weight: 600;
     font-family: 'DM Sans', sans-serif;
     cursor: pointer;
-    padding: 0;
     opacity: 0.6;
     transition: opacity 0.15s;
+    user-select: none;
 }
 .see-more-btn:hover { opacity: 1; }
+
 .see-more-btn svg {
     width: 13px;
     height: 13px;
     transition: transform 0.25s;
 }
-.see-more-btn.open svg { transform: rotate(180deg); }
+
+/* Gestion des labels "Voir plus / Voir moins" */
+.label-less { display: none; }
+
+.excerpt-toggle:checked ~ .see-more-btn .label-more { display: none; }
+.excerpt-toggle:checked ~ .see-more-btn .label-less { display: inline; }
+.excerpt-toggle:checked ~ .see-more-btn svg { transform: rotate(180deg); }
 
 /* ── REACTIONS ── */
 .post-reactions {
@@ -500,7 +513,7 @@ header {
 .submit-comment-btn {
     padding: 6px 16px;
     background: #002d47;
-    color: #F5EEEA;
+    color: whitesmoke;
     border: none;
     border-radius: 8px;
     font-size: 12.5px;
