@@ -1,9 +1,8 @@
 package models
 
 import (
-	"time"
-
 	"forum/database"
+	"time"
 )
 
 type Post struct {
@@ -14,8 +13,9 @@ type Post struct {
 	Image     string
 	UserName  string
 	CreatedAt time.Time
+	Comments  []Comments 
 }
-// A changer :!!!
+
 func InsertPost(post Post) (int64, error) {
 	query := "INSERT INTO posts (title, content, user_id, image) VALUES (?, ?, ?, ?)"
 	result, err := database.DB.Exec(query, post.Title, post.Content, post.UserId, post.Image)
@@ -35,13 +35,11 @@ func GetAllPosts() ([]Post, error) {
               FROM posts
               INNER JOIN users
               ON posts.user_id = users.id`
-
 	lignes, err := database.DB.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer lignes.Close()
-
 	for lignes.Next() {
 		post := Post{}
 		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.Image, &post.CreatedAt, &post.UserName)
@@ -50,17 +48,15 @@ func GetAllPosts() ([]Post, error) {
 		}
 		posts = append(posts, post)
 	}
-
 	if err := lignes.Err(); err != nil {
 		return nil, err
 	}
-
 	return posts, nil
 }
 
 func GetPostById(id int) (Post, error) {
 	post := Post{}
-	query := "SELECT id, title, content, user_id, image, created_at  FROM posts WHERE id = ?"
+	query := "SELECT id, title, content, user_id, image, created_at FROM posts WHERE id = ?"
 	err := database.DB.QueryRow(query, id).Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.Image, &post.CreatedAt)
 	if err != nil {
 		return Post{}, err
@@ -71,17 +67,15 @@ func GetPostById(id int) (Post, error) {
 func GetPostsByCategory(idcat int) ([]Post, error) {
 	posts := []Post{}
 	query := `SELECT p.id, p.title, p.content, p.user_id, p.image, p.created_at, u.username
-			  FROM posts p
-			  INNER JOIN post_category pc ON p.id = pc.post_id
-			  INNER JOIN users u ON p.user_id = u.id
-			  WHERE pc.category_id = ?`
-
+                  FROM posts p
+                  INNER JOIN post_category pc ON p.id = pc.post_id
+                  INNER JOIN users u ON p.user_id = u.id
+                  WHERE pc.category_id = ?`
 	lignes, err := database.DB.Query(query, idcat)
 	if err != nil {
 		return nil, err
 	}
 	defer lignes.Close()
-
 	for lignes.Next() {
 		post := Post{}
 		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.Image, &post.CreatedAt, &post.UserName)
@@ -90,10 +84,8 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 		}
 		posts = append(posts, post)
 	}
-
 	if err := lignes.Err(); err != nil {
 		return nil, err
 	}
-
 	return posts, nil
 }

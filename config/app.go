@@ -2,11 +2,14 @@ package config
 
 import (
 	"forum/database"
+	"log"
 )
 
 func Init() {
-	// Configuration de l'application, comme la connexion à la base de données, les variables d'environnement, etc.
 	database.DBinit()
 	LoadAssets()
-	TemplateParse()
+	// FIX: was called twice — once silently (result ignored) then again with error check
+	if err := TemplateParse(); err != nil {
+		log.Fatal("failed to parse templates: ", err)
+	}
 }

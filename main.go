@@ -13,5 +13,5 @@ func main() {
 	routes.Route()
 
 	log.Println("http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.ListenAndServe(":8080", nil)
 }

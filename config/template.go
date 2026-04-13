@@ -43,16 +43,13 @@ func GetTemplate(name string) *template.Template {
 	log.Printf("Template %s not found\n", name)
 	return nil
 }
+
 func RenderTemplate(w http.ResponseWriter, name string, data any) {
 	tmpl := GetTemplate(name)
 	if tmpl == nil {
 		http.Error(w, "Template not found", http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err := tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Template execution error", http.StatusInternalServerError)
-	}
+	_ = tmpl.Execute(w, data)
 }

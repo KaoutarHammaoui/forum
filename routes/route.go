@@ -8,20 +8,16 @@ import (
 )
 
 func Route() {
+	http.HandleFunc("/", handlers.Home)
+	//login routes
+	http.HandleFunc("/login", handlers.LoginH)
+	http.HandleFunc("/do-login", handlers.LoginHandler)
+	//logout
+	http.HandleFunc("/logout", handlers.LogOUT)
+
+	http.HandleFunc("/homeUser", middleware.AuthMiddleware(handlers.HomeUser))
 	http.HandleFunc("/register", handlers.RegisterHandler)
 	http.HandleFunc("/do-register", handlers.DoRegisterHandler)
-
-	//login routes
-	http.HandleFunc("/login",handlers.LoginH)
-	http.HandleFunc("/do-login",handlers.LoginHandler)
-	//logout
-	http.HandleFunc("/logout",handlers.LogOUT)
-
-	// http.HandleFunc("/",handlers.HomeHAndler)
-	//middleware
-	http.HandleFunc("/",middleware.AuthMiddleware(handlers.HomeHAndler))
-	http.HandleFunc("/add-comment", middleware.AuthMiddleware(handlers.AddCommentHandler))
-	http.HandleFunc("/react", middleware.AuthMiddleware(handlers.ReactionHandler))
-	//also in creating posts
-
+	http.HandleFunc("/comment", middleware.AuthMiddleware(handlers.AddComment))
+	http.HandleFunc("/react-post", middleware.AuthMiddleware(handlers.ReactPost))
 }
