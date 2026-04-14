@@ -367,12 +367,13 @@ width: clamp(190px, 10%, 700px);
 }
 
 .post-image {
-    display:block;
+    display: block;
     margin: 0 auto;
     width: 80%;
-    height: 300px;
-    object-fit: cover;
+    height: auto; /* 👈 important */
+    max-height: 300px;
     border-radius: 9px;
+    image-rendering: auto;
 }
 
 .post-body { display: flex; flex-direction: column; gap: 6px; }
