@@ -369,7 +369,7 @@ width: clamp(190px, 10%, 700px);
 .post-image {
     display: block;
     margin: 0 auto;
-    width: 80%;
+    width: 60%;
     height: auto; /* 👈 important */
     max-height: 300px;
     border-radius: 9px;
