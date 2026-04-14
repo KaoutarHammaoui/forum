@@ -144,7 +144,7 @@ header {
 
 /* ── SIDEBAR ── */
 .sidebar {
-    width: 25%;
+width: clamp(190px, 10%, 700px);
     flex-shrink: 0;
     background: rgb(252, 252, 252);
     border-radius: 14px;
@@ -316,6 +316,7 @@ header {
     flex-direction: column;
     gap: 12px;
 }
+
 .post-card:hover {
     box-shadow: 0 6px 24px rgba(0,45,71,0.09);
     transform: translateY(-1px);
@@ -326,6 +327,7 @@ header {
     align-items: center;
     gap: 10px;
 }
+
 
 .post-avatar {
     width: 36px;
@@ -368,7 +370,7 @@ header {
     display:block;
     margin: 0 auto;
     width: 80%;
-    height: 200px;
+    height: 300px;
     object-fit: cover;
     border-radius: 9px;
 }
