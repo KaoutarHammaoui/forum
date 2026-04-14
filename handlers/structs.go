@@ -13,4 +13,5 @@ type Data struct {
 	Posts      []models.Post
 	Categories []models.Category
 	Error      string
+	Action 		string
 }

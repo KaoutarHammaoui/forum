@@ -86,7 +86,8 @@ func TableCreation() {
 		(2, 'Science'),
 		(3, 'Art'),
 		(4, 'Music'),
-		(5, 'Animal')`,
+		(5, 'Animal'),
+		(6, 'Movies')`,
 		
 	}
 

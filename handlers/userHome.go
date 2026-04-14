@@ -15,15 +15,86 @@ import (
 )
 
 func HomeUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet && r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	if r.Method == http.MethodPost {
-		handleCreatePost(w, r)
-		return
-	}
-	handleGetHome(w, r)
+    if r.Method != http.MethodGet && r.Method != http.MethodPost {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    // POST : soit création de post, soit filtrage par catégorie
+    if r.Method == http.MethodPost {
+        // Si le form contient "title", c'est une création de post
+        if r.FormValue("title") != "" {
+            handleCreatePost(w, r)
+            return
+        }
+        // Sinon c'est un filtre par catégorie
+        handleGetHomeUser(w, r)
+        return
+    }
+
+    handleGetHomeUser(w, r)
+}
+
+func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
+    data := Data{}
+
+    categories, err := models.GetAllCategory()
+    if err != nil {
+        http.Error(w, "Error loading categories", http.StatusInternalServerError)
+        return
+    }
+    data.Categories = categories
+
+    if r.Method == http.MethodGet {
+        posts, err := models.GetAllPosts()
+        if err != nil {
+            http.Error(w, "Error loading posts", http.StatusInternalServerError)
+            return
+        }
+        data.Posts = posts
+
+    } else if r.Method == http.MethodPost {
+        r.ParseForm()
+        selectedCats := r.Form["category"]
+
+        isAll := false
+        for _, v := range selectedCats {
+            if v == "all" {
+                isAll = true
+                break
+            }
+        }
+
+        if isAll || len(selectedCats) == 0 {
+            posts, err := models.GetAllPosts()
+            if err != nil {
+                http.Error(w, "Error loading posts", http.StatusInternalServerError)
+                return
+            }
+            data.Posts = posts
+        } else {
+            postMap := map[int]models.Post{}
+            for _, catStr := range selectedCats {
+                catId, err := strconv.Atoi(catStr)
+                if err != nil {
+                    continue
+                }
+                posts, err := models.GetPostsByCategory(catId)
+                if err != nil {
+                    continue
+                }
+                for _, p := range posts {
+                    postMap[p.IdPost] = p
+                }
+            }
+            for _, p := range postMap {
+                data.Posts = append(data.Posts, p)
+            }
+        }
+    }
+
+    data.Action = "/homeUser"
+    config.RenderTemplate(w, "homeUser.html", data)
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -76,24 +147,6 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
 }
 
-func handleGetHome(w http.ResponseWriter, r *http.Request) {
-	data := Data{}
-	categories, err := models.GetAllCategory()
-	if err != nil {
-		http.Error(w, "Error loading categories", http.StatusInternalServerError)
-		return
-	}
-	data.Categories = categories
-
-	posts, err := models.GetAllPosts()
-	if err != nil {
-		http.Error(w, "Error loading posts", http.StatusInternalServerError)
-		return
-	}
-	data.Posts = posts
-
-	config.RenderTemplate(w, "homeUser.html", data)
-}
 
 func handleImageUpload(r *http.Request) (string, error) {
 	file, handler, err := r.FormFile("image")

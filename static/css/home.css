@@ -70,7 +70,45 @@ header {
 }
 
 .user { display: flex; align-items: center; gap: 8px; }
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: whitesmoke;
+    color: #002d47;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
+}
 
+.logout-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(245, 238, 234, 0.25);
+    background: rgba(245, 238, 234, 0.12);
+    color: whitesmoke;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: rgba(192, 57, 43, 0.25);
+    border-color: #C0392B;
+    color: #C0392B;
+}
+
+.logout-btn svg {
+    width: 16px;
+    height: 16px;
+}
 .auth-link {
     padding: 7px 18px;
     border-radius: 22px;
@@ -625,30 +663,25 @@ header {
     padding-bottom: 4px;
     border-bottom: 1px solid rgba(0,0,0,0.06);
     flex-shrink: 0;
+
 }
 
-
-.form-heading {
-    font-size: 22px;
-    font-weight: 700;
-    color: #0d1b2b;
-    margin-bottom: 22px;
-}
-.form-heading span { color: #002d47; }
 
 /* ── FIELDS ── */
 .field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .field label {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
-    color: #002d47;
+    color: #6f7172;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    
 }
 
 .field input[type="text"],
@@ -761,7 +794,7 @@ header {
     padding: 9px 22px;
     border-radius: 9px;
     border: none;
-    background: #002d47;
+    background:#A3232B;
     font-size: 13px;
     font-weight: 600;
     font-family: 'DM Sans', sans-serif;
@@ -771,3 +804,37 @@ header {
 }
 .btn-submit:hover  { background: #00243a; }
 .btn-submit:active { transform: scale(0.98); }
+
+.form-extra {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#form-more-toggle { display: none; }
+
+body:has(#form-more-toggle:checked) .form-extra {
+    max-height: 600px;
+    opacity: 1;
+}
+
+/* Cache le premier label quand ouvert */
+body:has(#form-more-toggle:checked) form > label[for="form-more-toggle"] {
+    display: none;
+}
+
+/* Cache le label-less dans form-extra quand fermé */
+.form-extra .see-more-btn {
+    display: none;
+}
+body:has(#form-more-toggle:checked) .form-extra .see-more-btn {
+    display: flex;
+}
+.label-lessz{
+    display: inline;
+}
+label[for="form-more-toggle"] svg { transition: transform 0.25s; }

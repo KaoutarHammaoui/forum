@@ -66,6 +66,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
+	data.Action = "/"
 	config.RenderTemplate(w, "home.html", data)
 }
