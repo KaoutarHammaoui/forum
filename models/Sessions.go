@@ -1,0 +1,53 @@
+package models
+
+import (
+	"errors"
+	"fmt"
+	"forum/database"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type Session struct {
+	IdSession int
+	UserId    int
+	Token     string
+	ExpiresAt time.Time
+}
+
+func InsertSession(idUser int) (string, error) {
+	query := "INSERT INTO session (user_id, token, expires_at) VALUES (?, ?, ?)"
+	token := uuid.New().String()
+	expires_at := time.Now().Add(time.Hour)
+	_, err := database.DB.Exec(query, idUser, token, expires_at)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func GetSessionByToken(token string) (Session, error) {
+	session := Session{}
+	query := "SELECT id, user_id, token, expires_at FROM session WHERE token = ?"
+	err := database.DB.QueryRow(query, token).Scan(&session.IdSession, &session.UserId, &session.Token, &session.ExpiresAt)
+	if err != nil {
+		return Session{}, err
+	}
+
+	if session.ExpiresAt.Before(time.Now()) {
+		DeleteSessionByToken(token)
+		return Session{}, errors.New("session expirée")
+	}
+	return session, nil
+}
+
+func DeleteSessionByToken(token string) error {
+	fmt.Print("delete session")
+	query := "DELETE  FROM session WHERE token = ?"
+	_, err := database.DB.Exec(query, token)
+	if err != nil {
+		return err
+	}
+	return nil
+}

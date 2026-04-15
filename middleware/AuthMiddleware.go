@@ -2,10 +2,9 @@ package middleware
 
 import (
 	"context"
+	"forum/models"
 	"net/http"
 	"time"
-
-	"forum/models"
 )
 
 type contextKey string
@@ -14,7 +13,7 @@ const UserIdKey contextKey = "userID"
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//prevent browser to store
+		// prevent browser to store
 		w.Header().Set("Cache-Control", "no-store,no-cache,must-revalidate, private")
 		w.Header().Set("Pragma", "no-cache")
 
