@@ -15,140 +15,131 @@ import (
 )
 
 func HomeUser(w http.ResponseWriter, r *http.Request) {
-    if r.Method != http.MethodGet && r.Method != http.MethodPost {
-        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-        return
-    }
 
-    // POST : soit création de post, soit filtrage par catégorie
-    if r.Method == http.MethodPost {
-        // Si le form contient "title", c'est une création de post
-        if r.FormValue("title") != "" {
-            handleCreatePost(w, r)
-            return
-        }
-        // Sinon c'est un filtre par catégorie
-        handleGetHomeUser(w, r)
-        return
-    }
+	switch r.Method {
+	case http.MethodGet:
+		handleGetHomeUser(w, r, "")
 
-    handleGetHomeUser(w, r)
+	case http.MethodPost:
+		handleCreatePost(w, r)
+
+	default:
+		Error(w, http.StatusMethodNotAllowed, "Method not allowed")
+	}
 }
 
-func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
-    data := Data{}
+func handleGetHomeUser(w http.ResponseWriter, r *http.Request, errMsg string) {
 
-    categories, err := models.GetAllCategory()
-    if err != nil {
-        http.Error(w, "Error loading categories", http.StatusInternalServerError)
-        return
-    }
-    data.Categories = categories
+	data := Data{
+		ErrorMsg: errMsg,
+	}
 
-    if r.Method == http.MethodGet {
-        posts, err := models.GetAllPosts()
-        if err != nil {
-            http.Error(w, "Error loading posts", http.StatusInternalServerError)
-            return
-        }
-        data.Posts = posts
+	categories, err := models.GetAllCategory()
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "Error loading categories")
+		return
+	}
+	data.Categories = categories
 
-    } else if r.Method == http.MethodPost {
-        r.ParseForm()
-        selectedCats := r.Form["category"]
+	posts, err := models.GetAllPosts()
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "Error loading posts")
+		return
+	}
 
-        isAll := false
-        for _, v := range selectedCats {
-            if v == "all" {
-                isAll = true
-                break
-            }
-        }
+	if r.Method == http.MethodPost {
+		r.ParseForm()
+		selectedCats := r.Form["categories"]
 
-        if isAll || len(selectedCats) == 0 {
-            posts, err := models.GetAllPosts()
-            if err != nil {
-                http.Error(w, "Error loading posts", http.StatusInternalServerError)
-                return
-            }
-            data.Posts = posts
-        } else {
-            postMap := map[int]models.Post{}
-            for _, catStr := range selectedCats {
-                catId, err := strconv.Atoi(catStr)
-                if err != nil {
-                    continue
-                }
-                posts, err := models.GetPostsByCategory(catId)
-                if err != nil {
-                    continue
-                }
-                for _, p := range posts {
-                    postMap[p.IdPost] = p
-                }
-            }
-            for _, p := range postMap {
-                data.Posts = append(data.Posts, p)
-            }
-        }
-    }
+		if len(selectedCats) > 0 && !contains(selectedCats, "all") {
+			postMap := make(map[int]models.Post)
 
-    data.Action = "/homeUser"
-    config.RenderTemplate(w, "homeUser.html", data)
+			for _, catStr := range selectedCats {
+				catID, err := strconv.Atoi(catStr)
+				if err != nil {
+					continue
+				}
+
+				catPosts, err := models.GetPostsByCategory(catID)
+				if err != nil {
+					continue
+				}
+
+				for _, p := range catPosts {
+					postMap[p.IdPost] = p
+				}
+			}
+
+			posts = []models.Post{}
+			for _, p := range postMap {
+				posts = append(posts, p)
+			}
+		}
+	}
+
+	data.Posts = posts
+	data.Action = "/homeUser"
+
+	config.RenderTemplate(w, "homeUser.html", data)
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(10 << 20); err != nil {
-		http.Error(w, "Invalid form data", http.StatusBadRequest)
+
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		Error(w, http.StatusBadRequest, "Invalid form data")
 		return
 	}
+
 	title := strings.TrimSpace(r.FormValue("title"))
 	content := strings.TrimSpace(r.FormValue("content"))
 	categories := r.Form["categories"]
-	if title == "" || content == "" || categories == nil {
-		//
+
+	// ✅ VALIDATION SIMPLE
+	if title == "" || content == "" || len(categories) == 0 {
+		handleGetHomeUser(w, r, "All fields are required")
 		return
 	}
+
 	if len(title) > 200 {
-		//
+		handleGetHomeUser(w, r, "Title must be less than 200 characters")
 		return
 	}
-	imagePath, err := handleImageUpload(r)
-	if err != nil {
-		//
+
+	imagePath, imgErr := handleImageUpload(r)
+	if imgErr != nil {
+		handleGetHomeUser(w, r, imgErr.Error())
 		return
 	}
+
 	userID, ok := r.Context().Value(middleware.UserIdKey).(int)
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		Error(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
-	post := models.Post{
+
+	postID, err := models.InsertPost(models.Post{
 		Title:   title,
 		Content: content,
 		UserId:  userID,
 		Image:   imagePath,
-	}
-
-	postID, err := models.InsertPost(post)
+	})
 	if err != nil {
-		//
+		Error(w, http.StatusInternalServerError, "Error creating post")
+		return
 	}
-	for _, catIDStr := range categories {
-		catID, err := strconv.Atoi(catIDStr)
 
-		if err != nil {
-			return
-		}
-		if err := models.InsertPostCategory(postID, catID); err != nil {
-			return
+	for _, catIDStr := range categories {
+		if catID, err := strconv.Atoi(catIDStr); err == nil {
+			models.InsertPostCategory(postID, catID)
 		}
 	}
+
 	http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
 }
 
-
 func handleImageUpload(r *http.Request) (string, error) {
+
 	file, handler, err := r.FormFile("image")
 	if err != nil {
 		return "", nil
@@ -156,27 +147,39 @@ func handleImageUpload(r *http.Request) (string, error) {
 	defer file.Close()
 
 	ext := strings.ToLower(filepath.Ext(handler.Filename))
-	allowed := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
+	allowed := map[string]bool{
+		".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true,
+	}
+
 	if !allowed[ext] {
-		return "", fmt.Errorf("format non supporté (%s)", ext)
+		return "", fmt.Errorf("unsupported image format")
 	}
 
 	uploadDir := "uploads"
-	if err := os.MkdirAll(uploadDir, 0755); err != nil {
-		return "", err
-	}
-	uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(handler.Filename))
-	dst := filepath.Join(uploadDir, uniqueName)
-	fmt.Println(dst)
+	os.MkdirAll(uploadDir, 0755)
 
-	out, err := os.Create(dst)
+	filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(handler.Filename))
+	path := filepath.Join(uploadDir, filename)
+
+	out, err := os.Create(path)
 	if err != nil {
 		return "", err
 	}
 	defer out.Close()
 
-	if _, err := io.Copy(out, file); err != nil {
+	_, err = io.Copy(out, file)
+	if err != nil {
 		return "", err
 	}
-	return strings.ReplaceAll(filepath.Join(uploadDir, uniqueName), "\\", "/"), nil
+
+	return strings.ReplaceAll(path, "\\", "/"), nil
+}
+
+func contains(arr []string, val string) bool {
+	for _, v := range arr {
+		if v == val {
+			return true
+		}
+	}
+	return false
 }

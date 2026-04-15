@@ -12,6 +12,6 @@ type Login struct {
 type Data struct {
 	Posts      []models.Post
 	Categories []models.Category
-	Error      string
+	ErrorMsg      string
 	Action 		string
 }
