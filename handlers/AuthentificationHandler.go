@@ -53,7 +53,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login?error=password", http.StatusSeeOther)
 		return
 	}
-
+	models.DeleteSessionsByUserID(user.ID)
 	token, err := models.InsertSession(user.ID)
 	if err != nil {
 		HandleError(w, "wrong", http.StatusInternalServerError)
