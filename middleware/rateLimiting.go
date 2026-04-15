@@ -28,7 +28,7 @@ func RateLimiter(next http.Handler) http.Handler {
 			return 
 		}
 		if time.Since(v.lastSenn) <time.Minute{
-			if v.count >4{
+			if v.count >=20{
 				mu.Unlock()
 				http.Error(w,"too many request",429)
 				return
