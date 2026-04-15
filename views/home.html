@@ -3,12 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="/static/css/home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Forum</title>
 </head>
 <body>
-    
-        <h1>Welcome forum guys :)</h1>
+    <div class="container">
+        <header>
+            {{template "header" .}}
+        </header>
 
-        <a href="/logout">logout</a>
+        <div class="main">
+            <nav class="sidebar">
+                {{template "ListCategorie" .}}
+            </nav>
+
+            <section class="main-content">
+                {{template "PostContent" .}}
+            </section>
+        </div>
+    </div>
+
+  
 </body>
 </html>

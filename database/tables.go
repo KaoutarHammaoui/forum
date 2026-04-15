@@ -73,4 +73,31 @@ func TableCreation() {
 			log.Fatal(err)
 		}
 	}
+	seedQueries := []string{
+		// USERS
+		`INSERT OR IGNORE INTO users (id, username, email, password) VALUES
+		(1, 'oumaima', 'oumaima@mail.com', '1234'),
+		(2, 'kaoutar', 'kaoutar@mail.com', '1234'),
+		(3, 'admin', 'admin@mail.com', '1234')`,
+
+		// CATEGORY
+		`INSERT OR IGNORE INTO category (id, name) VALUES
+		(1, 'Technologie'),
+		(2, 'Science'),
+		(3, 'Art'),
+		(4, 'Music'),
+		(5, 'Animal'),
+		(6, 'Movies')`,
+		
+	}
+
+	// INSERT DATA
+	for _, query := range seedQueries {
+		_, err := DB.Exec(query)
+		if err != nil {
+			log.Println("Seed error:", err)
+		}
+	}
+
+	log.Println("Seed data inserted successfully")
 }

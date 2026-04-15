@@ -2,8 +2,10 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"forum/database"
 	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -41,6 +43,7 @@ func GetSessionByToken(token string) (Session, error) {
 }
 
 func DeleteSessionByToken(token string) error {
+	fmt.Print("delete session")
 	query := "DELETE  FROM session WHERE token = ?"
 	_, err := database.DB.Exec(query, token)
 	if err != nil {

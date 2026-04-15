@@ -16,22 +16,16 @@ func LoginH(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
-	data:=Login{}
-	switch r.URL.Query().Get("error"){
+	data := Login{}
+	switch r.URL.Query().Get("error") {
 	case "email":
-		data.EmailError="No account found with this email"
-		data.HasErrors=true
-	case "password"	:
-		data.PasswordError="incorrect password"
-		data.HasErrors=true
+		data.EmailError = "No account found with this email"
+		data.HasErrors = true
+	case "password":
+		data.PasswordError = "incorrect password"
+		data.HasErrors = true
 	}
-
-	tmpl := config.GetTemplate("login.html")
-	if tmpl == nil {
-		http.Error(w, "tmpl not found", http.StatusUnauthorized)
-		return
-	}
-	tmpl.ExecuteTemplate(w,"login.html",data)
+	config.RenderTemplate(w, "login.html", data)
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,17 +43,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		data.EmailError = "no account with this email"
 		data.HasErrors = true
-
-		http.Redirect(w,r,"/login?error=email",http.StatusSeeOther)
-
+		http.Redirect(w, r, "/login?error=email", http.StatusSeeOther)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		data.PasswordError = "incorrect password"
 		data.HasErrors = true
-
-		http.Redirect(w,r,"/login?error=password",http.StatusSeeOther)
+		http.Redirect(w, r, "/login?error=password", http.StatusSeeOther)
 		return
 	}
 
@@ -76,15 +67,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Path:     "/",
 	})
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
 }
-
-
-
 
 func LogOUT(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
-
 	if err == nil {
 		models.DeleteSessionByToken(cookie.Value)
 	}
@@ -95,16 +82,5 @@ func LogOUT(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Path:     "/",
 	})
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
-}
-
-func renderLogin(w http.ResponseWriter, data Login) {
-	tmpl := config.GetTemplate("login.html")
-	if tmpl == nil {
-		http.Error(w, "credential error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tmpl.ExecuteTemplate(w,"login.html", data)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

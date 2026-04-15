@@ -1,8 +1,17 @@
 package handlers
 
+import "forum/models"
+
 type Login struct {
-	Email      string
-	EmailError string
-	PasswordError  string
-	HasErrors  bool
+	Email         string
+	EmailError    string
+	PasswordError string
+	HasErrors     bool
+}
+
+type Data struct {
+	Posts      []models.Post
+	Categories []models.Category
+	Error      string
+	Action 		string
 }
