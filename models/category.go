@@ -1,8 +1,6 @@
 package models
 
-import (
-	"forum/database"
-)
+import "forum/database"
 
 type Category struct {
 	IdCat int
