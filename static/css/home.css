@@ -369,9 +369,8 @@ width: clamp(190px, 10%, 700px);
 .post-image {
     display: block;
     margin: 0 auto;
-    width: 80%;
-    height: 80%; /* 👈 important */
-    max-height: 300px;
+    width: 60%;
+    height: 60%; /* 👈 important */
     border-radius: 9px;
     image-rendering: auto;
 }
@@ -809,3 +808,13 @@ body:has(#form-more-toggle:checked) .form-extra .see-more-btn {
     display: inline;
 }
 label[for="form-more-toggle"] svg { transition: transform 0.25s; }
+
+.form-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}

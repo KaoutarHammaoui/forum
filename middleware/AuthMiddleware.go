@@ -2,10 +2,9 @@ package middleware
 
 import (
 	"context"
+	"forum/models"
 	"net/http"
 	"time"
-
-	"forum/models"
 )
 
 type contextKey string
