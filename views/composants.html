@@ -48,53 +48,121 @@
             }
         </script>
 {{end}}
+{{define "PostContent"}}
+<div class="content-header">
+    <span class="section-label">Posts</span>
+</div>
 
-{{define "PostContent"}}    
-        <div class="content-header">
-            <span class="section-label">Posts</span>
+{{ if not .Posts }}
+<div class="no-posts">
+    <p>No posts yet.</p>
+</div>
+{{ else }}
+<div class="posts-list">
+    {{ range .Posts }}
+    <div class="post-card">
+
+        <!-- POST HEADER -->
+        <div class="post-header">
+            <div class="post-avatar">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="3.5" fill="currentColor" opacity="0.9"/>
+                    <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
+                </svg>
+            </div>
+            <div class="post-meta">
+                <span class="post-author">{{ .UserName }}</span>
+                <span class="post-date">{{ .CreatedAt.Format "02 Jan 2006" }}</span>
+            </div>
         </div>
 
-        {{ if not .Posts }}
-        <div class="no-posts">
-            <p>No posts yet.</p>
+        <!-- POST IMAGE -->
+        {{ if .Image }}
+        <div class="post-image-container">
+            <img class="post-image" src="/{{ .Image }}" alt="post image">
         </div>
-        {{ else }}
-        <div class="posts-list">
-            {{ range .Posts }}
-            <div class="post-card">
-                <div class="post-header">
+        {{ end }}
+
+        <!-- POST BODY -->
+        <div class="post-body">
+            <h3 class="post-title">{{ .Title }}</h3>
+
+            <input type="checkbox" class="excerpt-toggle" id="excerpt-{{ .IdPost }}">
+            <p class="post-excerpt">{{ .Content }}</p>
+            <label class="see-more-btn" for="excerpt-{{ .IdPost }}">
+                <span class="label-more">Voir plus</span>
+                <span class="label-less">Voir moins</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </label>
+        </div>
+
+        <!-- REACTIONS + COMMENTS TOGGLE -->
+        <div class="post-reactions">
+            <button class="reaction-btn like-btn" data-post-id="{{ .IdPost }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span>Like</span>
+            </button>
+
+            <button class="reaction-btn dislike-btn" data-post-id="{{ .IdPost }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                </svg>
+                <span>Dislike</span>
+            </button>
+
+            <!-- CHECKBOX COMMENTS TOGGLE (CSS-only) -->
+            <input type="checkbox" class="comment-toggle" id="comments-{{ .IdPost }}">
+            <label class="comment-toggle-btn" for="comments-{{ .IdPost }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span class="label-more">Comments</span>
+                <span class="label-less">Fermer</span>
+            </label>
+
+            <!-- COMMENTS SECTION (contrôlée par la checkbox) -->
+            <div class="comments-section">
+                <div class="comments-inner">
+
+                    <div class="comments-header">
+                        <h4 class="comments-title">Comments</h4>
+                        <span class="comments-count" data-post-id="{{ .IdPost }}">0</span>
+                    </div>
+
+                    <!-- Écrire un commentaire -->
+                    <div class="write-comment">
                     <div class="post-avatar">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="12" cy="8" r="3.5" fill="currentColor" opacity="0.9"/>
                             <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
                         </svg>
+                                
+                    </div>                        <div class="comment-input-wrap">
+                            <textarea class="comment-input" placeholder="Écrire un commentaire..." rows="2"></textarea>
+                            <div class="comment-actions">
+                                <button class="submit-comment-btn" data-post-id="{{ .IdPost }}">Publier</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="post-meta">
-                        <span class="post-author">{{ .UserName }}</span>
-                        <span class="post-date">{{ .CreatedAt.Format "02 Jan 2006" }}</span>
+
+                    <!-- Liste des commentaires -->
+                    <div class="comments-list" data-post-id="{{ .IdPost }}">
+                        <div class="no-comments">Soyez le premier à commenter...</div>
                     </div>
-                </div>
 
-                {{ if .Image }}
-                <img class="post-image" src="/{{ .Image }}" alt="post image">
-                {{ end }}
-
-                <div class="post-body">
-                    <h3 class="post-title">{{ .Title }}</h3>
-                    <input type="checkbox" class="excerpt-toggle" id="toggle-{{ .IdPost }}">
-                    <p class="post-excerpt">{{ .Content }}</p>
-                    <label class="see-more-btn" for="toggle-{{ .IdPost }}">
-                        <span class="label-more">Voir plus</span>
-                        <span class="label-less">Voir moins</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                    </label>
                 </div>
             </div>
-            {{ end }}
         </div>
-        {{ end }}
+
+    </div>
+    {{ end }}
+</div>
+{{ end }}
 {{end}}
 {{define "CreatePost"}}
 
