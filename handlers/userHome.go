@@ -37,62 +37,42 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 
 func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
     data := Data{}
+    
+    // Get User ID from Context
+    userID, _ := r.Context().Value(middleware.UserIdKey).(int)
 
-    categories, err := models.GetAllCategory()
-    if err != nil {
-        http.Error(w, "Error loading categories", http.StatusInternalServerError)
-        return
-    }
+    // Always load categories for the sidebar
+    categories, _ := models.GetAllCategory()
     data.Categories = categories
 
-    if r.Method == http.MethodGet {
-        posts, err := models.GetAllPosts()
-        if err != nil {
-            http.Error(w, "Error loading posts", http.StatusInternalServerError)
-            return
-        }
-        data.Posts = posts
+    // Parse Query Parameters (r.URL.Query() for GET)
+    query := r.URL.Query()
+    selectedCats := query["category"]
+    filterLikes := query.Get("myLikes") == "true"
+    filterMyPosts := query.Get("myPosts") == "true"
 
-    } else if r.Method == http.MethodPost {
-        r.ParseForm()
-        selectedCats := r.Form["category"]
-
-        isAll := false
-        for _, v := range selectedCats {
-            if v == "all" {
-                isAll = true
-                break
-            }
-        }
-
-        if isAll || len(selectedCats) == 0 {
-            posts, err := models.GetAllPosts()
-            if err != nil {
-                http.Error(w, "Error loading posts", http.StatusInternalServerError)
-                return
-            }
-            data.Posts = posts
-        } else {
-            postMap := map[int]models.Post{}
-            for _, catStr := range selectedCats {
-                catId, err := strconv.Atoi(catStr)
-                if err != nil {
-                    continue
-                }
-                posts, err := models.GetPostsByCategory(catId)
-                if err != nil {
-                    continue
-                }
-                for _, p := range posts {
-                    postMap[p.IdPost] = p
-                }
-            }
-            for _, p := range postMap {
-                data.Posts = append(data.Posts, p)
-            }
+    // Check if "all" is selected
+    isAll := false
+    for _, v := range selectedCats {
+        if v == "all" {
+            isAll = true
+            break
         }
     }
 
+    // If "all" is selected or no category filter is present, pass an empty slice to the model
+    if isAll {
+        selectedCats = []string{}
+    }
+
+    // Fetch posts using the new combined filter logic
+    posts, err := models.GetFilteredPosts(userID, selectedCats, filterLikes, filterMyPosts)
+    if err != nil {
+        http.Error(w, "Error loading posts", http.StatusInternalServerError)
+        return
+    }
+    
+    data.Posts = posts
     data.Action = "/homeUser"
     config.RenderTemplate(w, "homeUser.html", data)
 }

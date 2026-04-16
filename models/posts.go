@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"forum/database"
@@ -97,4 +98,69 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 	}
 
 	return posts, nil
+}
+
+func GetFilteredPosts(userID int, selectedCats []string, filterLikes, filterMyPosts bool) ([]Post, error) {
+    var posts []Post
+    
+    // Base Query
+    query := `SELECT DISTINCT p.id, p.title, p.content, p.user_id, p.image, p.created_at, u.username
+              FROM posts p
+              INNER JOIN users u ON p.user_id = u.id`
+    
+    var conditions []string
+    var args []interface{}
+
+    // 1. Filter by Likes
+    if filterLikes {
+        query += " INNER JOIN likes_dislikes ld ON p.id = ld.post_id"
+        conditions = append(conditions, "ld.user_id = ? AND ld.type = 'like' AND ld.type = 'dislike'")
+        args = append(args, userID)
+    }
+
+    // 2. Filter by Categories
+    if len(selectedCats) > 0 {
+        query += " INNER JOIN post_category pc ON p.id = pc.post_id"
+        
+        // Create placeholders (?, ?, ?) for the categories
+        placeholders := []string{}
+        for _, cat := range selectedCats {
+            if cat != "all" {
+                placeholders = append(placeholders, "?")
+                args = append(args, cat)
+            }
+        }
+        if len(placeholders) > 0 {
+            conditions = append(conditions, "pc.category_id IN (" + strings.Join(placeholders, ",") + ")")
+        }
+    }
+
+    // 3. Filter by User's Own Posts
+    if filterMyPosts {
+        conditions = append(conditions, "p.user_id = ?")
+        args = append(args, userID)
+    }
+
+    // Combine all WHERE conditions
+    if len(conditions) > 0 {
+        query += " WHERE " + strings.Join(conditions, " AND ")
+    }
+
+    query += " ORDER BY p.created_at DESC"
+
+    rows, err := database.DB.Query(query, args...)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        var p Post
+        err := rows.Scan(&p.IdPost, &p.Title, &p.Content, &p.UserId, &p.Image, &p.CreatedAt, &p.UserName)
+        if err != nil {
+            return nil, err
+        }
+        posts = append(posts, p)
+    }
+    return posts, nil
 }
