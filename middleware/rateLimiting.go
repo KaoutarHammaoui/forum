@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"forum/config"
 	"net/http"
 	"sync"
 	"time"
+	// "forum/handlers"
 )
 
 type requests struct {
@@ -28,14 +30,19 @@ func RateLimiter(next http.Handler) http.Handler {
 			return
 		}
 
-		if time.Since(v.lastSenn) <time.Minute{
-			if v.count >=20{
+		if time.Since(v.lastSenn) < time.Minute {
+			if v.count >= 3 {
 				mu.Unlock()
-				http.Error(w, "too many request", 429)
-				return
+				w.WriteHeader(429)
+				data:=map[string]string{
+					"Error": "Too manny requests",
+					"Status":http.StatusText(429),
+				}
+				config.RenderTemplate(w,"error.html",data)
+				return 
 			}
 			v.count++
-		} else {
+			} else {
 			v.count = 1
 			v.lastSenn = time.Now()
 		}
