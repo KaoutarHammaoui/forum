@@ -32,3 +32,4 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 	models.InsertComment(comment)
 	http.Redirect(w, r, "/homeUser", 302)
 }
+

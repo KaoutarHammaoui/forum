@@ -19,6 +19,7 @@ func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 	data := Data{}
 
 	categories, err := models.GetAllCategory()
+
 	if err != nil {
 		HandleError(w, "Error loading categories", http.StatusInternalServerError)
 		return
@@ -30,6 +31,13 @@ func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			HandleError(w, "Error loading posts", http.StatusInternalServerError)
 			return
+		}
+		for i, p := range posts {
+			comments, err := models.FetchComment(p.IdPost)
+			if err != nil {
+				continue
+			}
+			posts[i].Comments = comments
 		}
 		data.Posts = posts
 
@@ -50,6 +58,15 @@ func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				HandleError(w, "Error loading posts", http.StatusInternalServerError)
 				return
+			}
+
+			//fetching post comments
+			for i, p := range posts {
+				comments, err := models.FetchComment(p.IdPost)
+				if err != nil {
+					continue
+				}
+				posts[i].Comments = comments
 			}
 			data.Posts = posts
 		} else {
