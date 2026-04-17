@@ -34,4 +34,6 @@ func Route() {
 	http.Handle("/createPost",
 		middleware.RateLimiter(middleware.AuthMiddleware(http.HandlerFunc(handlers.CreatePost))))
 
+	//comments
+	http.Handle("/SubmitComment",middleware.RateLimiter(middleware.AuthMiddleware(http.HandlerFunc(handlers.AddComment))))	
 }

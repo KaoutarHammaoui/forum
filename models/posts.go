@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"time"
 
 	"forum/database"
@@ -13,6 +14,7 @@ type Post struct {
 	UserId    int
 	Image     string
 	UserName  string
+	Comments  []Comments
 	CreatedAt time.Time
 }
 
@@ -96,4 +98,27 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 	}
 
 	return posts, nil
+}
+
+func FetchComment(postId int) ([]Comments, error) {
+	comments := []Comments{}
+	query := `SELECT comments.id, comments.user_id, comments.post_id,comments.content,comments.created_at,users.username
+	FROM comments INNER JOIN users ON comments.user_id=users.id
+			WHERE comments.post_id=? `
+
+	rows, err := database.DB.Query(query, postId)
+	if err != nil {
+		log.Println("FetchComment error:", err)
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		c := Comments{}
+		err := rows.Scan(&c.IdComment, &c.UserId, &c.PostId, &c.Content, &c.CreatedAt, &c.Username)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, c)
+	}
+	return comments, nil
 }
