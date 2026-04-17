@@ -13,11 +13,12 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	handleGetHomeUser(w, r)
+	
 }
 
 func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 	data := Data{}
-
+	data.IsLogged=true
 	categories, err := models.GetAllCategory()
 
 	if err != nil {

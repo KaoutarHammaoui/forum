@@ -23,6 +23,14 @@ func Home(w http.ResponseWriter, r *http.Request) {
 			HandleError(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+		for i,p:=range posts{
+			comments,err:=models.FetchComment(p.IdPost)
+			if err!=nil{
+				continue
+			}
+			posts[i].Comments=comments
+
+		}
 		data.Posts = posts
 
 	} else if r.Method == http.MethodPost {

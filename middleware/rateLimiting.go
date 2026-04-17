@@ -31,11 +31,11 @@ func RateLimiter(next http.Handler) http.Handler {
 		}
 
 		if time.Since(v.lastSenn) < time.Minute {
-			if v.count >= 3 {
+			if v.count >= 20 {
 				mu.Unlock()
 				w.WriteHeader(429)
 				data:=map[string]string{
-					"Error": "Too manny requests",
+					"Error": "Too manny requests, Tty after 1min",
 					"Status":http.StatusText(429),
 				}
 				config.RenderTemplate(w,"error.html",data)
