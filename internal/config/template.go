@@ -11,50 +11,47 @@ var Templates map[string]*template.Template
 
 // TemplateParse now only parses individual files in the views folder
 func TemplateParse() error {
-    Templates = make(map[string]*template.Template)
-    
-    pages, err := filepath.Glob("./views/*.html")
-    if err != nil {
-        return err
-    }
+	Templates = make(map[string]*template.Template)
 
-    for _, page := range pages {
-        // Parse each file individually
-        tmpl, err := template.ParseFiles(page)
-        if err != nil {
-            log.Printf("Error parsing template %s: %v\n", page, err)
-            return err
-        }
+	pages, err := filepath.Glob("./internal/template/*.html")
+	if err != nil {
+		return err
+	}
 
-        name := filepath.Base(page)
-        Templates[name] = tmpl
-    }
+	for _, page := range pages {
+		tmpl, err := template.ParseFiles(page)
+		if err != nil {
+			log.Printf("Error parsing template %s: %v\n", page, err)
+			return err
+		}
 
-    return nil
+		name := filepath.Base(page)
+		Templates[name] = tmpl
+	}
+
+	return nil
 }
 
 func GetTemplate(name string) *template.Template {
-    if tmpl, exists := Templates[name]; exists {
-        return tmpl
-    }
-    log.Printf("Template %s not found\n", name)
-    return nil
+	if tmpl, exists := Templates[name]; exists {
+		return tmpl
+	}
+	log.Printf("Template %s not found\n", name)
+	return nil
 }
 
 func RenderTemplate(w http.ResponseWriter, name string, data any) {
-    tmpl := GetTemplate(name)
-    if tmpl == nil {
-        http.Error(w, "Template not found", http.StatusInternalServerError)
-        return
-    }
+	tmpl := GetTemplate(name)
+	if tmpl == nil {
+		http.Error(w, "Template not found", http.StatusInternalServerError)
+		return
+	}
 
-    w.Header().Set("Content-Type", "text/html; charset=utf-8")
-    
-    // Use Execute instead of ExecuteTemplate since we are 
-    // mapping 1 file to 1 template object directly.
-    err := tmpl.Execute(w, data)
-    if err != nil {
-        log.Printf("Error rendering template %s: %v\n", name, err)
-        http.Error(w, "Error rendering template", http.StatusInternalServerError)
-    }
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		log.Printf("Error rendering template %s: %v\n", name, err)
+		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+	}
 }
