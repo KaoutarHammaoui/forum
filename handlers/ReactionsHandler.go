@@ -35,6 +35,10 @@ func ReactPost(w http.ResponseWriter, r *http.Request) {
 
 
 func ReactComment(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+		HandleError(w, "Method not allowed", 405)
+		return
+	}
 	UserID := r.Context().Value(middleware.UserIdKey).(int)
 	postId := r.FormValue("postID")
 	commentId := r.FormValue("commentID")
