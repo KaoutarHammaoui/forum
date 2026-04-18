@@ -7,16 +7,17 @@ import (
 )
 
 type Post struct {
-	IdPost    int
-	Title     string
-	Content   string
-	UserId    int 
-	Image     string
-	UserName  string
-	Comments  []Comments
-	Likes     int
-	Dislikes  int
-	CreatedAt time.Time
+	IdPost       int
+	Title        string
+	Content      string
+	UserId       int
+	Image        string
+	UserName     string
+	Comments     []Comments
+	Likes        int
+	Dislikes     int
+	UserReaction string
+	CreatedAt    time.Time
 }
 
 func InsertPost(post Post) (int64, error) {

@@ -291,15 +291,229 @@ h1 {
   letter-spacing: -0.06em;
 }
 
+.topbar-home {
+  margin-bottom: 28px;
+}
+
+.topbar-subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.board-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.sidebar-card,
+.composer-card,
+.post-card,
+.empty-card,
+.locked-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.sidebar-card {
+  align-self: start;
+  padding: 24px;
+  position: sticky;
+  top: 20px;
+}
+
+.sidebar-block + .sidebar-block {
+  margin-top: 24px;
+}
+
+.filter-chip {
+  display: block;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+}
+
+.filter-chip.is-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.feed {
+  display: grid;
+  gap: 24px;
+}
+
+.composer-card,
+.post-card,
+.empty-card {
+  padding: 28px;
+}
+
+.composer-copy h1 {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.02;
+}
+
+.composer-copy p,
+.empty-card p,
+.empty-text,
+.inline-login,
+.comment-meta span,
+.post-date,
+.comment-reaction-counts,
+.reaction-counts {
+  color: var(--muted);
+}
+
+.post-form,
+.comment-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.post-form-row {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+}
+
+.form-group textarea,
+.comment-form textarea,
+.form-group select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(31, 34, 48, 0.14);
+  border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  font: inherit;
+  color: var(--text);
+}
+
+.form-group textarea:focus,
+.comment-form textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: rgba(187, 90, 60, 0.55);
+  box-shadow: 0 0 0 4px rgba(187, 90, 60, 0.12);
+}
+
+.locked-card {
+  margin-top: 24px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.posts-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.post-meta,
+.comment-meta,
+.reaction-row,
+.reaction-actions,
+.comment-reaction-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.post-meta,
+.comment-meta {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-author {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.post-title {
+  margin: 14px 0 10px;
+  font-family: "Outfit", sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.post-content,
+.comment-card p {
+  margin: 0;
+  line-height: 1.75;
+}
+
+.reaction-row {
+  margin-top: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reaction-counts,
+.comment-reaction-counts {
+  font-size: 0.95rem;
+}
+
+.btn-small {
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+}
+
+.comments-block {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.comments-block h3 {
+  margin: 0 0 16px;
+  font-family: "Outfit", sans-serif;
+  font-size: 1.15rem;
+}
+
+.comments-list {
+  display: grid;
+  gap: 12px;
+}
+
+.comment-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(31, 34, 48, 0.08);
+}
+
+.inline-login {
+  display: inline-block;
+  margin-top: 16px;
+  font-weight: 700;
+}
+
 @media (max-width: 900px) {
   .hero,
-  .auth-shell {
+  .auth-shell,
+  .board-layout {
     grid-template-columns: 1fr;
   }
 
   .topbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .sidebar-card {
+    position: static;
   }
 }
 
@@ -312,7 +526,11 @@ h1 {
   .hero-copy,
   .panel-card,
   .auth-container,
-  .error-card {
+  .error-card,
+  .composer-card,
+  .post-card,
+  .empty-card,
+  .sidebar-card {
     padding: 24px;
   }
 
@@ -329,5 +547,12 @@ h1 {
   .topbar-actions .btn,
   .hero-actions .btn {
     flex: 1 1 100%;
+  }
+
+  .post-form-row,
+  .locked-card,
+  .reaction-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
