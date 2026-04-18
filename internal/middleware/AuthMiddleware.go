@@ -2,7 +2,8 @@ package middleware
 
 import (
 	"context"
-	"forum/models"
+	models "forum/internal/model"
+
 	"net/http"
 	"time"
 )
