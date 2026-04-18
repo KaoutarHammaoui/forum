@@ -1,8 +1,10 @@
 package models
 
 import (
+	"fmt"
 	"forum/internal/database"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -96,6 +98,47 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 	}
 
 	if err := lignes.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func GetPostsByCategories(categoryIDs []int) ([]Post, error) {
+	if len(categoryIDs) == 0 {
+		return GetAllPosts()
+	}
+
+	posts := []Post{}
+	placeholders := make([]string, len(categoryIDs))
+	args := make([]any, len(categoryIDs))
+	for i, categoryID := range categoryIDs {
+		placeholders[i] = "?"
+		args[i] = categoryID
+	}
+
+	query := fmt.Sprintf(`SELECT DISTINCT p.id, p.title, p.content, p.user_id, p.image, p.created_at, u.username
+		FROM posts p
+		INNER JOIN post_category pc ON p.id = pc.post_id
+		INNER JOIN users u ON p.user_id = u.id
+		WHERE pc.category_id IN (%s)`, strings.Join(placeholders, ","))
+
+	rows, err := database.DB.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		post := Post{}
+		err := rows.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.Image, &post.CreatedAt, &post.UserName)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 

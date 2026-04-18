@@ -16,9 +16,7 @@
     <div class="shell">
       <header class="topbar topbar-home">
         <div class="topbar-copy">
-          <span class="topbar-kicker">Community board</span>
           <a href="/" class="brand">Forum</a>
-          <p class="topbar-subtitle">Posts, categories, comments, and reactions in one clean space.</p>
         </div>
         <nav class="topbar-actions">
           {{if .IsLoggedIn}}
@@ -37,52 +35,43 @@
         <aside class="sidebar-card">
           <div class="sidebar-block">
             <p class="panel-label">Browse</p>
-            <a href="/{{if .SelectedView}}?view={{.SelectedView}}{{end}}" class="filter-chip {{if eq .SelectedCategoryID 0}}is-active{{end}}">All Categories</a>
-            {{range .Categories}}
-            <a
-              href="/?category={{.IdCat}}{{if $.SelectedView}}&view={{$.SelectedView}}{{end}}"
-              class="filter-chip {{if eq $.SelectedCategoryID .IdCat}}is-active{{end}}"
-            >
-              {{.Name}}
-            </a>
-            {{end}}
+            <form action="/" method="GET" class="filter-form">
+              <div class="filter-grid">
+                {{range .Categories}}
+                <label class="filter-option {{if index $.SelectedCategoryMap .IdCat}}is-active{{end}}">
+                  <input type="checkbox" name="category" value="{{.IdCat}}" {{if index $.SelectedCategoryMap .IdCat}}checked{{end}} />
+                  <span>{{.Name}}</span>
+                </label>
+                {{end}}
+              </div>
+
+              {{if .SelectedView}}
+              <input type="hidden" name="view" value="{{.SelectedView}}" />
+              {{end}}
+
+              <div class="filter-actions">
+                <button type="submit" class="btn btn-primary btn-small">Apply Filters</button>
+                <a href="/{{if .SelectedView}}?view={{.SelectedView}}{{end}}" class="btn btn-ghost btn-small">Clear Categories</a>
+              </div>
+            </form>
           </div>
 
           {{if .IsLoggedIn}}
           <div class="sidebar-block">
             <p class="panel-label">Your Feed</p>
-            <a href="/?view=mine{{if gt .SelectedCategoryID 0}}&category={{.SelectedCategoryID}}{{end}}" class="filter-chip {{if eq .SelectedView "mine"}}is-active{{end}}">My Posts</a>
-            <a href="/?view=liked{{if gt .SelectedCategoryID 0}}&category={{.SelectedCategoryID}}{{end}}" class="filter-chip {{if eq .SelectedView "liked"}}is-active{{end}}">Liked Posts</a>
+            <a href="/?view=mine{{range .SelectedCategoryIDs}}&category={{.}}{{end}}" class="filter-chip {{if eq .SelectedView "mine"}}is-active{{end}}">My Posts</a>
+            <a href="/?view=liked{{range .SelectedCategoryIDs}}&category={{.}}{{end}}" class="filter-chip {{if eq .SelectedView "liked"}}is-active{{end}}">Liked Posts</a>
             <a href="/" class="filter-chip">Reset Filters</a>
           </div>
           {{end}}
 
-          <div class="sidebar-block sidebar-note">
-            <p class="panel-label">Signal</p>
-            <p>Minimal by default. Useful when active. Built for reading, posting, and quick reactions.</p>
-          </div>
         </aside>
 
         <main class="feed">
           <section class="composer-card">
             <div class="composer-hero">
               <div class="composer-copy">
-                <span class="eyebrow">Forum Board</span>
-                <h1>Modern discussion, stripped back to what matters.</h1>
-                <p>
-                  Everyone can browse and filter by category. Posting, commenting, and reacting are
-                  available after login.
-                </p>
-              </div>
-              <div class="hero-metrics">
-                <div class="metric-card">
-                  <span class="metric-value">{{len .Posts}}</span>
-                  <span class="metric-label">Visible posts</span>
-                </div>
-                <div class="metric-card">
-                  <span class="metric-value">{{len .Categories}}</span>
-                  <span class="metric-label">Categories</span>
-                </div>
+                <h1>Discussion</h1>
               </div>
             </div>
 
@@ -101,12 +90,15 @@
               <div class="post-form-row">
                 <div class="form-group">
                   <label for="category_id">Categories</label>
-                  <select id="category_id" name="category_id" multiple size="5">
+                  <div id="category_id" class="category-checkboxes">
                     {{range .Categories}}
-                    <option value="{{.IdCat}}">{{.Name}}</option>
+                    <label class="category-option">
+                      <input type="checkbox" name="category_id" value="{{.IdCat}}" />
+                      <span>{{.Name}}</span>
+                    </label>
                     {{end}}
-                  </select>
-                  <small class="field-hint">Hold Ctrl or Cmd to choose more than one category.</small>
+                  </div>
+                  <small class="field-hint">Choose one or more categories for your post.</small>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Publish Post</button>
@@ -122,11 +114,7 @@
 
           <section class="posts-stack">
             <div class="section-heading">
-              <div>
-                <span class="section-kicker">Feed</span>
-                <h2>Latest conversations</h2>
-              </div>
-              <span class="section-count">{{len .Posts}} posts</span>
+              <h2>Posts</h2>
             </div>
             {{if .Posts}}
             {{range .Posts}}
@@ -164,7 +152,20 @@
               </div>
 
               <div class="comments-block">
-                <h3>Comments</h3>
+                <div class="comments-header">
+                  <h3>{{len .Comments}} Comments</h3>
+                </div>
+
+                {{if $.IsLoggedIn}}
+                <form action="/comments" method="POST" class="comment-form">
+                  <input type="hidden" name="post_id" value="{{.IdPost}}" />
+                  <textarea name="content" rows="3" placeholder="Write a comment..." required></textarea>
+                  <button type="submit" class="btn btn-primary btn-small">Comment</button>
+                </form>
+                {{else}}
+                <a href="/login" class="inline-login">Login to comment</a>
+                {{end}}
+
                 {{if .Comments}}
                 <div class="comments-list">
                   {{range .Comments}}
@@ -174,43 +175,35 @@
                       <span>{{.CreatedAt.Format "02 Jan 2006 15:04"}}</span>
                     </div>
                     <p>{{.Content}}</p>
-                    <div class="comment-reaction-counts">
-                      <span>Likes: {{.Likes}}</span>
-                      <span>Dislikes: {{.Dislikes}}</span>
+                    <div class="comment-footer">
+                      <div class="comment-reaction-counts">
+                        <span>{{.Likes}} likes</span>
+                        <span>{{.Dislikes}} dislikes</span>
+                      </div>
+                      {{if $.IsLoggedIn}}
+                      <div class="reaction-actions comment-actions">
+                        <form action="/reactions" method="POST">
+                          <input type="hidden" name="post_id" value="{{.PostId}}" />
+                          <input type="hidden" name="comment_id" value="{{.IdComment}}" />
+                          <input type="hidden" name="type" value="like" />
+                          <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "like"}}is-active{{end}}">Like</button>
+                        </form>
+                        <form action="/reactions" method="POST">
+                          <input type="hidden" name="post_id" value="{{.PostId}}" />
+                          <input type="hidden" name="comment_id" value="{{.IdComment}}" />
+                          <input type="hidden" name="type" value="dislike" />
+                          <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "dislike"}}is-active{{end}}">Dislike</button>
+                        </form>
+                      </div>
+                      {{else}}
+                      <a href="/login" class="inline-login inline-login-small">Login to react</a>
+                      {{end}}
                     </div>
-                    {{if $.IsLoggedIn}}
-                    <div class="reaction-actions comment-actions">
-                      <form action="/reactions" method="POST">
-                        <input type="hidden" name="post_id" value="{{.PostId}}" />
-                        <input type="hidden" name="comment_id" value="{{.IdComment}}" />
-                        <input type="hidden" name="type" value="like" />
-                        <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "like"}}is-active{{end}}">Like</button>
-                      </form>
-                      <form action="/reactions" method="POST">
-                        <input type="hidden" name="post_id" value="{{.PostId}}" />
-                        <input type="hidden" name="comment_id" value="{{.IdComment}}" />
-                        <input type="hidden" name="type" value="dislike" />
-                        <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "dislike"}}is-active{{end}}">Dislike</button>
-                      </form>
-                    </div>
-                    {{else}}
-                    <a href="/login" class="inline-login">Login to react to comments</a>
-                    {{end}}
                   </div>
                   {{end}}
                 </div>
                 {{else}}
                 <p class="empty-text">No comments yet.</p>
-                {{end}}
-
-                {{if $.IsLoggedIn}}
-                <form action="/comments" method="POST" class="comment-form">
-                  <input type="hidden" name="post_id" value="{{.IdPost}}" />
-                  <textarea name="content" rows="3" placeholder="Write a comment..." required></textarea>
-                  <button type="submit" class="btn btn-primary btn-small">Add Comment</button>
-                </form>
-                {{else}}
-                <a href="/login" class="inline-login">Login to comment</a>
                 {{end}}
               </div>
             </article>

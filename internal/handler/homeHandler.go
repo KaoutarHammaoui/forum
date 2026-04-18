@@ -10,13 +10,14 @@ import (
 )
 
 type Data struct {
-	Title              string
-	IsLoggedIn         bool
-	UserID             int
-	Categories         []models.Category
-	Posts              []models.Post
-	SelectedCategoryID int
-	SelectedView       string
+	Title               string
+	IsLoggedIn          bool
+	UserID              int
+	Categories          []models.Category
+	Posts               []models.Post
+	SelectedCategoryIDs []int
+	SelectedCategoryMap map[int]bool
+	SelectedView        string
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -33,20 +34,26 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, selectedCategoryID, selectedView, err := loadPosts(r, userID, loggedIn)
+	posts, selectedCategoryIDs, selectedView, err := loadPosts(r, userID, loggedIn)
 	if err != nil {
 		HandleError(w, "could not load posts", http.StatusInternalServerError)
 		return
 	}
 
+	selectedCategoryMap := make(map[int]bool, len(selectedCategoryIDs))
+	for _, categoryID := range selectedCategoryIDs {
+		selectedCategoryMap[categoryID] = true
+	}
+
 	data := Data{
-		Title:              "Home",
-		IsLoggedIn:         loggedIn,
-		UserID:             userID,
-		Categories:         categories,
-		Posts:              posts,
-		SelectedCategoryID: selectedCategoryID,
-		SelectedView:       selectedView,
+		Title:               "Home",
+		IsLoggedIn:          loggedIn,
+		UserID:              userID,
+		Categories:          categories,
+		Posts:               posts,
+		SelectedCategoryIDs: selectedCategoryIDs,
+		SelectedCategoryMap: selectedCategoryMap,
+		SelectedView:        selectedView,
 	}
 
 	config.RenderTemplate(w, "index.html", data)
@@ -219,8 +226,8 @@ func ReactPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func loadPosts(r *http.Request, userID int, loggedIn bool) ([]models.Post, int, string, error) {
-	selectedCategoryID := 0
+func loadPosts(r *http.Request, userID int, loggedIn bool) ([]models.Post, []int, string, error) {
+	selectedCategoryIDs := []int{}
 	selectedView := strings.TrimSpace(r.URL.Query().Get("view"))
 	if selectedView != "mine" && selectedView != "liked" {
 		selectedView = ""
@@ -229,10 +236,12 @@ func loadPosts(r *http.Request, userID int, loggedIn bool) ([]models.Post, int, 
 		selectedView = ""
 	}
 
-	if categoryParam := strings.TrimSpace(r.URL.Query().Get("category")); categoryParam != "" {
-		id, err := strconv.Atoi(categoryParam)
-		if err == nil && id > 0 {
-			selectedCategoryID = id
+	seenCategories := map[int]bool{}
+	for _, categoryParam := range r.URL.Query()["category"] {
+		id, err := strconv.Atoi(strings.TrimSpace(categoryParam))
+		if err == nil && id > 0 && !seenCategories[id] {
+			selectedCategoryIDs = append(selectedCategoryIDs, id)
+			seenCategories[id] = true
 		}
 	}
 
@@ -241,13 +250,13 @@ func loadPosts(r *http.Request, userID int, loggedIn bool) ([]models.Post, int, 
 		err   error
 	)
 
-	if selectedCategoryID > 0 {
-		posts, err = models.GetPostsByCategory(selectedCategoryID)
+	if len(selectedCategoryIDs) > 0 {
+		posts, err = models.GetPostsByCategories(selectedCategoryIDs)
 	} else {
 		posts, err = models.GetAllPosts()
 	}
 	if err != nil {
-		return nil, 0, "", err
+		return nil, nil, "", err
 	}
 
 	enrichedPosts := make([]models.Post, 0, len(posts))
@@ -279,5 +288,5 @@ func loadPosts(r *http.Request, userID int, loggedIn bool) ([]models.Post, int, 
 		enrichedPosts = append(enrichedPosts, post)
 	}
 
-	return enrichedPosts, selectedCategoryID, selectedView, nil
+	return enrichedPosts, selectedCategoryIDs, selectedView, nil
 }
