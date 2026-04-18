@@ -71,7 +71,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	title := strings.TrimSpace(r.FormValue("title"))
 	content := strings.TrimSpace(r.FormValue("content"))
-	categoryID, _ := strconv.Atoi(r.FormValue("category_id"))
+	categoryValues := r.Form["category_id"]
 
 	if title == "" || content == "" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -88,7 +88,14 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if categoryID > 0 {
+	seenCategories := map[int]bool{}
+	for _, rawCategoryID := range categoryValues {
+		categoryID, err := strconv.Atoi(rawCategoryID)
+		if err != nil || categoryID <= 0 || seenCategories[categoryID] {
+			continue
+		}
+
+		seenCategories[categoryID] = true
 		if err := models.InsertPostCategory(postID, categoryID); err != nil {
 			HandleError(w, "could not save category", http.StatusInternalServerError)
 			return
@@ -162,35 +169,46 @@ func ReactPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var commentID *int
+	if rawCommentID := strings.TrimSpace(r.FormValue("comment_id")); rawCommentID != "" {
+		parsedCommentID, err := strconv.Atoi(rawCommentID)
+		if err != nil || parsedCommentID <= 0 {
+			HandleError(w, "bad request", http.StatusBadRequest)
+			return
+		}
+		commentID = &parsedCommentID
+	}
+
 	reactionType := r.FormValue("type")
 	if reactionType != "like" && reactionType != "dislike" {
 		HandleError(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
-	currentReaction, err := models.CheckReactionByUser(userID, postID, nil)
+	currentReaction, err := models.CheckReactionByUser(userID, postID, commentID)
 	if err != nil {
 		HandleError(w, "could not update reaction", http.StatusInternalServerError)
 		return
 	}
 
 	if currentReaction == reactionType {
-		if err := models.DeleteReaction(userID, postID, nil); err != nil {
+		if err := models.DeleteReaction(userID, postID, commentID); err != nil {
 			HandleError(w, "could not remove reaction", http.StatusInternalServerError)
 			return
 		}
 	} else {
 		if currentReaction != "" {
-			if err := models.DeleteReaction(userID, postID, nil); err != nil {
+			if err := models.DeleteReaction(userID, postID, commentID); err != nil {
 				HandleError(w, "could not replace reaction", http.StatusInternalServerError)
 				return
 			}
 		}
 
 		_, err = models.InsertReaction(models.Reaction{
-			UserID: userID,
-			PostID: postID,
-			Type:   reactionType,
+			UserID:    userID,
+			PostID:    postID,
+			CommentID: commentID,
+			Type:      reactionType,
 		})
 		if err != nil {
 			HandleError(w, "could not save reaction", http.StatusInternalServerError)
@@ -241,6 +259,10 @@ func loadPosts(r *http.Request, userID int, loggedIn bool) ([]models.Post, int, 
 		if loggedIn {
 			reaction, _ := models.GetReactionByUser(userID, post.IdPost)
 			post.UserReaction = reaction
+			for i := range post.Comments {
+				commentReaction, _ := models.CheckReactionByUser(userID, post.IdPost, &post.Comments[i].IdComment)
+				post.Comments[i].UserReaction = commentReaction
+			}
 
 			switch selectedView {
 			case "mine":

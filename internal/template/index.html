@@ -36,10 +36,10 @@
         <aside class="sidebar-card">
           <div class="sidebar-block">
             <p class="panel-label">Browse</p>
-            <a href="/" class="filter-chip {{if eq .SelectedCategoryID 0}}is-active{{end}}">All Categories</a>
+            <a href="/{{if .SelectedView}}?view={{.SelectedView}}{{end}}" class="filter-chip {{if eq .SelectedCategoryID 0}}is-active{{end}}">All Categories</a>
             {{range .Categories}}
             <a
-              href="/?category={{.IdCat}}"
+              href="/?category={{.IdCat}}{{if $.SelectedView}}&view={{$.SelectedView}}{{end}}"
               class="filter-chip {{if eq $.SelectedCategoryID .IdCat}}is-active{{end}}"
             >
               {{.Name}}
@@ -50,8 +50,8 @@
           {{if .IsLoggedIn}}
           <div class="sidebar-block">
             <p class="panel-label">Your Feed</p>
-            <a href="/?view=mine" class="filter-chip {{if eq .SelectedView "mine"}}is-active{{end}}">My Posts</a>
-            <a href="/?view=liked" class="filter-chip {{if eq .SelectedView "liked"}}is-active{{end}}">Liked Posts</a>
+            <a href="/?view=mine{{if gt .SelectedCategoryID 0}}&category={{.SelectedCategoryID}}{{end}}" class="filter-chip {{if eq .SelectedView "mine"}}is-active{{end}}">My Posts</a>
+            <a href="/?view=liked{{if gt .SelectedCategoryID 0}}&category={{.SelectedCategoryID}}{{end}}" class="filter-chip {{if eq .SelectedView "liked"}}is-active{{end}}">Liked Posts</a>
             <a href="/" class="filter-chip">Reset Filters</a>
           </div>
           {{end}}
@@ -82,13 +82,13 @@
 
               <div class="post-form-row">
                 <div class="form-group">
-                  <label for="category_id">Category</label>
-                  <select id="category_id" name="category_id">
-                    <option value="">No category</option>
+                  <label for="category_id">Categories</label>
+                  <select id="category_id" name="category_id" multiple size="5">
                     {{range .Categories}}
                     <option value="{{.IdCat}}">{{.Name}}</option>
                     {{end}}
                   </select>
+                  <small class="field-hint">Hold Ctrl or Cmd to choose more than one category.</small>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Publish Post</button>
@@ -125,12 +125,12 @@
                   <form action="/reactions" method="POST">
                     <input type="hidden" name="post_id" value="{{.IdPost}}" />
                     <input type="hidden" name="type" value="like" />
-                    <button type="submit" class="btn btn-ghost btn-small">Like</button>
+                    <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "like"}}is-active{{end}}">Like</button>
                   </form>
                   <form action="/reactions" method="POST">
                     <input type="hidden" name="post_id" value="{{.IdPost}}" />
                     <input type="hidden" name="type" value="dislike" />
-                    <button type="submit" class="btn btn-ghost btn-small">Dislike</button>
+                    <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "dislike"}}is-active{{end}}">Dislike</button>
                   </form>
                 </div>
                 {{else}}
@@ -153,6 +153,24 @@
                       <span>Likes: {{.Likes}}</span>
                       <span>Dislikes: {{.Dislikes}}</span>
                     </div>
+                    {{if $.IsLoggedIn}}
+                    <div class="reaction-actions comment-actions">
+                      <form action="/reactions" method="POST">
+                        <input type="hidden" name="post_id" value="{{.PostId}}" />
+                        <input type="hidden" name="comment_id" value="{{.IdComment}}" />
+                        <input type="hidden" name="type" value="like" />
+                        <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "like"}}is-active{{end}}">Like</button>
+                      </form>
+                      <form action="/reactions" method="POST">
+                        <input type="hidden" name="post_id" value="{{.PostId}}" />
+                        <input type="hidden" name="comment_id" value="{{.IdComment}}" />
+                        <input type="hidden" name="type" value="dislike" />
+                        <button type="submit" class="btn btn-ghost btn-small {{if eq .UserReaction "dislike"}}is-active{{end}}">Dislike</button>
+                      </form>
+                    </div>
+                    {{else}}
+                    <a href="/login" class="inline-login">Login to react to comments</a>
+                    {{end}}
                   </div>
                   {{end}}
                 </div>

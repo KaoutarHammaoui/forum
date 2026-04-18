@@ -115,6 +115,12 @@ h1 {
   border: 1px solid var(--line);
 }
 
+.btn-ghost.is-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
 .btn-block {
   width: 100%;
 }
@@ -365,6 +371,7 @@ h1 {
 .empty-card p,
 .empty-text,
 .inline-login,
+.field-hint,
 .comment-meta span,
 .post-date,
 .comment-reaction-counts,
@@ -395,6 +402,16 @@ h1 {
   background: var(--surface-strong);
   font: inherit;
   color: var(--text);
+}
+
+.form-group select[multiple] {
+  min-height: 150px;
+}
+
+.field-hint {
+  display: block;
+  font-size: 0.88rem;
+  margin-top: 6px;
 }
 
 .form-group textarea:focus,
@@ -485,6 +502,10 @@ h1 {
 .comments-list {
   display: grid;
   gap: 12px;
+}
+
+.comment-actions {
+  margin-top: 12px;
 }
 
 .comment-card {

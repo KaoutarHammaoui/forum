@@ -6,14 +6,15 @@ import (
 )
 
 type Comments struct {
-	IdComment int
-	UserId    int
-	PostId    int
-	Content   string
-	CreatedAt time.Time
-	Username  string
-	Likes     int
-	Dislikes  int
+	IdComment    int
+	UserId       int
+	PostId       int
+	Content      string
+	CreatedAt    time.Time
+	Username     string
+	Likes        int
+	Dislikes     int
+	UserReaction string
 }
 
 func InsertComment(c Comments) error {
