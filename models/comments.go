@@ -12,6 +12,7 @@ type Comments struct {
         Content   string
         CreatedAt time.Time
         Username  string
+        Likes     int
 }
 
 func InsertComment(c Comments) error {

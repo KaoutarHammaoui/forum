@@ -165,6 +165,11 @@
                         <div class="comments" style="display:flex;  gap: 6px;">
                             <span style="color:black; font-size: 14px; font-family: monospace; font-style: italic;font-weight: bolder;">@{{.Username}}</span>
                             <p>{{ .Content}}</p>
+                            <div style="display: inline; position: absolute; right: 3px; gap: 12px;">
+                                <button>♡</button>
+                            <p style="font-size: 10px; color: gray; font-weight: bolder;">{{.Likes}}</p>
+                            </div>
+                            
                         </div>
                         {{end}}
                     </div>
