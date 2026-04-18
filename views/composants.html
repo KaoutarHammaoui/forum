@@ -105,12 +105,14 @@
 
             {{ if eq $.Action "/" }}
                 {{ $url = "/login" }}    {{ $method = "get" }}
-            {{ else if eq $.Action "/userHome" }}
+            {{ else if eq $.Action "/homeUser" }}
                 {{ $url = "/reactions" }}    {{ $method = "post" }}
             {{ end }}
 
             <form action="{{ $url }}" method="{{ $method }}" class="post-reactions">
                 <input type="hidden" name="post_id" value="{{ .IdPost }}">
+                <input type="hidden" name="redirect" value="{{ $.Action}}">
+
                 <button type="submit"  name="type" value="like" class="reaction-btn like-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -166,22 +168,28 @@
                     </div>
                     </form>
                     {{else}}
-                        <p><a href="/login">login</a> to comment :></p>
+                        <p><a href="/login" class="login-to-comment">login</a> to comment :></p>
                     {{end}}    
                     <!-- Liste des commentaires -->
-                    <div class="comments-list" data-post-id="{{ .IdPost }}">
-                        {{if not .Comments}}
+                   <div class="comments-list" data-post-id="{{ .IdPost }}">
+                    {{ if not .Comments }}
                         <div class="no-comments">Soyez le premier à commenter...</div>
-                        {{end}}
+                    {{ end }}
 
-                        {{range .Comments }}
-                        <div class="comments" style="display:flex;  gap: 6px;">
-                            <span style="color:black; font-size: 14px; font-family: monospace; font-style: italic;font-weight: bolder;">@{{.Username}}</span>
-                            <p>{{ .Content}}</p>
+                    {{ range .Comments }}
+                        <div class="comment-item">
+                            <div class="post-avatar">
+                                {{ slice .Username 0 1 }}
+                            </div>
+                            <div class="comment-body">
+                                <div class="comment-top">
+                                    <span class="comment-author">@{{ .Username }}</span>
+                                </div>
+                                <p class="comment-text">{{ .Content }}</p>
+                            </div>
                         </div>
-                        {{end}}
-                    </div>
-
+                    {{ end }}
+                </div>
                 </div>
             </div>
         </div>

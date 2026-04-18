@@ -34,10 +34,19 @@ func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for i, p := range posts {
+			countlikes, err := models.CountLikeDislikeByPost(p.IdPost, "like")
+			if err != nil {
+
+			}
+			countdislike, err := models.CountLikeDislikeByPost(p.IdPost, "dislike")
+			if err != nil {
+
+			}
 			comments, err := models.FetchComment(p.IdPost)
 			if err != nil {
-				continue
 			}
+			posts[i].Likes = countlikes
+			posts[i].Dislikes = countdislike
 			posts[i].Comments = comments
 		}
 		data.Posts = posts
@@ -70,7 +79,7 @@ func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 
 				}
-				countdislikes, err := models.CountLikeDislikeByPost(p.IdPost, "dislikes")
+				countdislikes, err := models.CountLikeDislikeByPost(p.IdPost, "dislike")
 				if err != nil {
 
 				}
