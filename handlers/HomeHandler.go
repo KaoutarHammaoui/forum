@@ -2,12 +2,18 @@ package handlers
 
 import (
 	"forum/config"
+	"forum/middleware"
 	"forum/models"
 	"net/http"
 	"strconv"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
+	session, err := middleware.GetSession(r)
+	if err == nil && session != nil {
+		http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
+		return
+	}
 	categories, err := models.GetAllCategory()
 	if err != nil {
 		HandleError(w, "Internal Server Error", http.StatusInternalServerError)

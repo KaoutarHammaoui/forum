@@ -16,6 +16,7 @@ func LoginH(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, "invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+	
 	data := Login{}
 	switch r.URL.Query().Get("error") {
 	case "email":
