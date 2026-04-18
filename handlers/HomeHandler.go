@@ -18,19 +18,35 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	data.Categories = categories
 
 	if r.Method == http.MethodGet {
+
 		posts, err := models.GetAllPosts()
 		if err != nil {
 			HandleError(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		for i,p:=range posts{
-			comments,err:=models.FetchComment(p.IdPost)
-			if err!=nil{
-				continue
+		for i, p := range posts {
+			countlikes, err := models.CountLikeDislikeByPost(p.IdPost, "like")
+			if err != nil {
+
+				return
 			}
-			posts[i].Comments=comments
+			posts[i].Likes = countlikes
+
+			Countdislikes, err := models.CountLikeDislikeByPost(p.IdPost, "dislike")
+			if err != nil {
+				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			posts[i].Dislikes = Countdislikes
+			comments, err := models.FetchComment(p.IdPost)
+			if err != nil {
+				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			posts[i].Comments = comments
 
 		}
+		
 		data.Posts = posts
 
 	} else if r.Method == http.MethodPost {

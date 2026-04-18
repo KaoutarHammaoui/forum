@@ -13,12 +13,12 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	handleGetHomeUser(w, r)
-	
+
 }
 
 func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 	data := Data{}
-	data.IsLogged=true
+	data.IsLogged = true
 	categories, err := models.GetAllCategory()
 
 	if err != nil {
@@ -65,8 +65,17 @@ func handleGetHomeUser(w http.ResponseWriter, r *http.Request) {
 			for i, p := range posts {
 				comments, err := models.FetchComment(p.IdPost)
 				if err != nil {
-					continue
 				}
+				countlikes, err := models.CountLikeDislikeByPost(p.IdPost, "like")
+				if err != nil {
+
+				}
+				countdislikes, err := models.CountLikeDislikeByPost(p.IdPost, "dislikes")
+				if err != nil {
+
+				}
+				posts[i].Likes = countlikes
+				posts[i].Dislikes = countdislikes
 				posts[i].Comments = comments
 			}
 			data.Posts = posts

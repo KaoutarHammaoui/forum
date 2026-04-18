@@ -9,19 +9,25 @@ import (
 )
 
 func ReactPost(w http.ResponseWriter, r *http.Request) {
+	reaction := models.Reaction{}
 	if r.Method != http.MethodPost {
 		HandleError(w, "Method not allowed", 405)
 		return
 	}
 
 	userID := r.Context().Value(middleware.UserIdKey).(int)
-
 	postID, _ := strconv.Atoi(r.FormValue("post_id"))
-	reactionType := r.FormValue("type") // like / dislike
+	reactionType := r.FormValue("type")
 
-	err := models.SetReaction(userID, postID, nil, reactionType)
+	reaction.UserID = userID
+	reaction.PostID = postID
+	reaction.Type = reactionType
+	reaction.CommentID = nil
+
+
+	_,err := models.InsertReaction(reaction)
 	if err != nil {
-		HandleError(w, "DB error", 500)
+	
 		return
 	}
 

@@ -11,10 +11,12 @@ type Post struct {
 	IdPost    int
 	Title     string
 	Content   string
-	UserId    int
+	UserId    int 
 	Image     string
 	UserName  string
 	Comments  []Comments
+	Likes     int
+	Dislikes  int
 	CreatedAt time.Time
 }
 
