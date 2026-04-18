@@ -422,7 +422,6 @@ width: clamp(190px, 10%, 700px);
 .excerpt-toggle:checked ~ .see-more-btn .label-less { display: inline; }
 .excerpt-toggle:checked ~ .see-more-btn svg { transform: rotate(180deg); }
 
-/* ── REACTIONS ── */
 .post-reactions {
     display: flex;
     align-items: center;
@@ -435,7 +434,7 @@ width: clamp(190px, 10%, 700px);
 .reaction-btn {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     padding: 6px 14px;
     border-radius: 22px;
     border: 1.5px solid rgba(0,45,71,0.1);
@@ -447,18 +446,55 @@ width: clamp(190px, 10%, 700px);
     color: #002d47;
     transition: all 0.18s;
 }
-.reaction-btn svg { width: 15px; height: 15px; }
-.like-btn:hover, .like-btn.active {
+
+.reaction-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.reaction-label {
+    line-height: 1;
+}
+
+.reaction-count {
+    background: rgba(0,45,71,0.07);
+    border-radius: 10px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+    transition: background 0.18s, color 0.18s;
+}
+
+/* Like */
+.like-btn:hover,
+.like-btn.active {
     background: rgba(26,122,74,0.08);
     border-color: #1a7a4a;
     color: #1a7a4a;
 }
-.dislike-btn:hover, .dislike-btn.active {
+
+.like-btn:hover .reaction-count,
+.like-btn.active .reaction-count {
+    background: rgba(26,122,74,0.15);
+    color: #1a7a4a;
+}
+
+/* Dislike */
+.dislike-btn:hover,
+.dislike-btn.active {
     background: rgba(192,57,43,0.08);
     border-color: #C0392B;
     color: #C0392B;
 }
 
+.dislike-btn:hover .reaction-count,
+.dislike-btn.active .reaction-count {
+    background: rgba(192,57,43,0.15);
+    color: #C0392B;
+}
 /* ── COMMENT TOGGLE (CSS-only) ── */
 .comment-toggle { display: none; }
 
