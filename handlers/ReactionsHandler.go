@@ -9,7 +9,7 @@ import (
 )
 
 func ReactPost(w http.ResponseWriter, r *http.Request) {
-	reaction := models.Reaction{}
+		reaction := models.Reaction{}
 	if r.Method != http.MethodPost {
 		HandleError(w, "Method not allowed", 405)
 		return
@@ -24,18 +24,37 @@ func ReactPost(w http.ResponseWriter, r *http.Request) {
 	reaction.Type = reactionType
 	reaction.CommentID = nil
 
-	_, err := models.InsertReaction(reaction)
+	// Vérifier si une réaction existe déjà
+	existingType, err := models.GetReactionByUser(userID, postID)
 	if err != nil {
-
+		HandleError(w, "Internal Server Error", 500)
 		return
 	}
 
-	http.Redirect(w, r, "/homeUser", 302)
+	if existingType == reactionType {
+		// Même réaction → on supprime (toggle off)
+		models.DeleteReaction(userID, postID,reaction.CommentID)
+	} else {
+		// Pas de réaction ou réaction différente → supprimer l'ancienne et insérer
+		models.DeleteReaction(userID, postID,reaction.CommentID)
+		reaction := models.Reaction{
+			UserID:    userID,
+			PostID:    postID,
+			Type:      reactionType,
+			CommentID: nil,
+		}
+		_, err := models.InsertReaction(reaction)
+		if err != nil {
+			HandleError(w, "Internal Server Error", 500)
+			return
+		}
+	}
+
+	http.Redirect(w, r, r.FormValue("redirect"), 302)
 }
 
-
 func ReactComment(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
+	if r.Method != http.MethodPost {
 		HandleError(w, "Method not allowed", 405)
 		return
 	}
@@ -62,37 +81,37 @@ func ReactComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if reactionChecking == "" {
-		_,err:=models.InsertReaction(models.Reaction{
+		_, err := models.InsertReaction(models.Reaction{
 			UserID:    UserID,
 			PostID:    postID,
 			CommentID: commentIDPtr,
 			Type:      reactionType,
 		})
-		if err!=nil{
-			HandleError(w,"delete error",500)
+		if err != nil {
+			HandleError(w, "delete error", 500)
 			return
 		}
 
 	} else if reactionChecking == reactionType {
-		err:=models.DeleteReaction(UserID, postID, &commentID)
-		if err!=nil{
-			HandleError(w,"delete error",500)
+		err := models.DeleteReaction(UserID, postID, &commentID)
+		if err != nil {
+			HandleError(w, "delete error", 500)
 			return
 		}
 	} else {
-		err:=models.DeleteReaction(UserID, postID, &commentID)
-		if err!=nil{
-			HandleError(w,"delete error",500)
+		err := models.DeleteReaction(UserID, postID, &commentID)
+		if err != nil {
+			HandleError(w, "delete error", 500)
 			return
 		}
-		_,er:=models.InsertReaction(models.Reaction{
+		_, er := models.InsertReaction(models.Reaction{
 			UserID:    UserID,
 			PostID:    postID,
 			CommentID: commentIDPtr,
 			Type:      reactionType,
 		})
-		if er!=nil{
-			HandleError(w,"delete error",500)
+		if er != nil {
+			HandleError(w, "delete error", 500)
 			return
 		}
 	}

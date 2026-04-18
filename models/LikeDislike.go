@@ -29,7 +29,7 @@ func DeleteReaction(userId int,postID int,commentID *int) error{
 }
 
 func CheckReactionByUser(userId int,postID int,commentID *int) (string,error) {
-	query:=`SELECT type FROM likes_dislikes WHERE likes_dislikes.user_id=? and likes_dislikes.post_id=? and likes_dislikes.comment_id=?`
+	query:=`SELECT type FROM likes_dislikes WHERE likes_dislikes.user_id=? and likes_dislikes.post_id=? and likes_dislikes.comment_id IS ?`
 	row:=database.DB.QueryRow(query,userId,postID,commentID)
 	var reactionType string
 	err:=row.Scan(&reactionType)
@@ -56,4 +56,13 @@ func CountLikesByComments(commentID int,post_id int,Type string)(int,error){
 		return 0,err
 	}
 	return count,nil 
+}
+func GetReactionByUser(userId, postId int) (string, error) {
+	reactionType := ""
+	query := "SELECT type FROM likes_dislikes WHERE user_id = ? AND post_id = ? LIMIT 1"
+	err := database.DB.QueryRow(query, userId, postId).Scan(&reactionType)
+	if err != nil {
+		return "", nil // pas de réaction trouvée
+	}
+	return reactionType, nil
 }

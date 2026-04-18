@@ -40,3 +40,16 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r.WithContext(cts))
 	}
 }
+func GetSession(r *http.Request) (*models.Session, error) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		return nil, err
+	}
+
+	session, err := models.GetSessionByToken(cookie.Value)
+	if err != nil {
+		return nil, err
+	}
+
+	return &session, nil
+}
