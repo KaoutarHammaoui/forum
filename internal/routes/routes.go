@@ -9,6 +9,8 @@ import (
 func Route() {
 	http.HandleFunc("/", middleware.CheckUserContext(handler.Index))
 	http.HandleFunc("/login", handler.Login)
-	// http.HandleFunc("/register", handler.register)
-
+	http.HandleFunc("/register", handler.Register)
+	http.HandleFunc("/logout", handler.LogOUT)
+	http.HandleFunc("/static/", handler.StaticHandler)
+	http.HandleFunc("/uploads/", handler.UploadsHandler)
 }

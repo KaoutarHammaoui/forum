@@ -3,45 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create an account</title>
-    <link rel="stylesheet" href="../static/css/style.css" />
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body>
-    <div class="auth-container">
-      <form action="/do-login" method="POST" class="auth-form">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="kaoutar@gmail.com"
-            required
-            value="{{.Email}}"
-          />
-          {{if .EmailError}}<span class="error">{{.EmailError}}</span>{{end}}
+  <body class="page page-auth">
+    <div class="shell auth-shell">
+      <section class="auth-copy">
+        <span class="eyebrow">Welcome Back</span>
+        <h1>Sign in and jump straight into the conversation.</h1>
+        <p>The login form now posts to a working route and keeps the entered email on failure.</p>
+      </section>
+
+      <section class="auth-container">
+        <div class="auth-header">
+          <h1>Login</h1>
+          <p>Use your account to continue.</p>
         </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            placeholder="********"
-            minlength="6"
-          />
-          {{if .PasswordError}}<span class="error">{{.PasswordError}}</span
-          >{{end}}
+        <form action="/login" method="POST" class="auth-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+              required
+              value="{{.Email}}"
+            />
+            {{if .EmailError}}<span class="error">{{.EmailError}}</span>{{end}}
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="********"
+              minlength="6"
+            />
+            {{if .PasswordError}}<span class="error">{{.PasswordError}}</span>{{end}}
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Log in</button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Need an account? <a href="/register">Create one</a></p>
         </div>
-
-        <button type="submit" class="btn-primary">log in</button>
-      </form>
-
-      <div class="auth-footer">
-        <p>create an account? <a href="/register">Sign in</a></p>
-      </div>
+      </section>
     </div>
   </body>
 </html>

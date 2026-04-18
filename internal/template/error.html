@@ -3,30 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/static/css/error.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Pacifico&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <title>Error</title>
   </head>
-  <body>
-    <div class="container">
-      <header>
-        <div class="logo">
-          <p>Forum</p>
-        </div>
-      </header>
-
-      <div class="error-wrapper">
-        <div class="error-card">
-          <div class="error-code">{{index . "Status"}}</div>
-          <div class="error-divider"></div>
-          <p class="error-message">{{index . "Error"}}</p>
-          <a href="/homeUser" class="back-btn">Go back home</a>
-        </div>
+  <body class="page page-error">
+    <div class="shell error-shell">
+      <a href="/" class="brand">Forum</a>
+      <div class="error-card">
+        <div class="error-code">{{index . "Status"}}</div>
+        <p class="error-message">{{index . "Error"}}</p>
+        <a href="/" class="btn btn-primary">Go back home</a>
       </div>
     </div>
   </body>
