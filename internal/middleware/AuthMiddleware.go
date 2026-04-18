@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	models "forum/internal/model"
+	"forum/internal/config"
 
 	"net/http"
 	"time"
@@ -24,7 +24,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		session, err := models.GetSessionByToken(cookie.Value)
+		session, err := config.GetSessionByToken(cookie.Value)
 		if err != nil {
 			http.SetCookie(w, &http.Cookie{
 				Name:     "token",
