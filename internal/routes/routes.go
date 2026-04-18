@@ -8,4 +8,7 @@ import (
 
 func Route() {
 	http.HandleFunc("/", middleware.CheckUserContext(handler.Index))
+	http.HandleFunc("/login", handler.Login)
+	// http.HandleFunc("/register", handler.register)
+
 }

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create an account</title>
+    <link rel="stylesheet" href="../static/css/style.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Create an account</h1>
+        <p>Enter your details below to create your account</p>
+      </div>
+
+      <form action="/do-register" method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="kuuhaku"
+            required
+            value="{{.Username}}"
+          />
+          {{if .UsernameError}}<span class="error">{{.UsernameError}}</span
+          >{{end}}
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="kuuhaku@kuu.com"
+            required
+            value="{{.Email}}"
+          />
+          {{if .EmailError}}<span class="error">{{.EmailError}}</span>{{end}}
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            placeholder="********"
+            minlength="6"
+          />
+          {{if .PasswordError}}<span class="error">{{.PasswordError}}</span
+          >{{end}}
+        </div>
+
+        <button type="submit" class="btn-primary">Create account</button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="/login">Login</a></p>
+      </div>
+    </div>
+  </body>
+</html>
