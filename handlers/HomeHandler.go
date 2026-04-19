@@ -44,7 +44,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			posts[i].Dislikes = Countdislikes
-			comments, err := models.FetchComment(p.IdPost)
+			comments, err := models.GetCommentsByPost(p.IdPost)
 			if err != nil {
 				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
 				return
@@ -52,7 +52,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 			posts[i].Comments = comments
 
 		}
-		
+
 		data.Posts = posts
 
 	} else if r.Method == http.MethodPost {

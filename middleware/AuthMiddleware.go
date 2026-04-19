@@ -2,10 +2,9 @@ package middleware
 
 import (
 	"context"
+	"forum/models"
 	"net/http"
 	"time"
-
-	"forum/models"
 )
 
 type contextKey string
@@ -41,7 +40,6 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r.WithContext(cts))
 	}
 }
-
 func GetSession(r *http.Request) (*models.Session, error) {
 	cookie, err := r.Cookie("token")
 	if err != nil {

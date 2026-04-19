@@ -36,7 +36,7 @@ func Route() {
 
 	//comments
 	http.Handle("/SubmitComment",middleware.RateLimiter(middleware.AuthMiddleware(http.HandlerFunc(handlers.AddComment))))	
-
-	//Reactions
+	http.Handle("/reactOnAComment",middleware.RateLimiter(middleware.AuthMiddleware(http.HandlerFunc(handlers.ReactComment))))
+	//
 	http.Handle("/reactions", middleware.AuthMiddleware(handlers.ReactPost))
 }

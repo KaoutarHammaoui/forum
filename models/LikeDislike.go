@@ -18,40 +18,25 @@ func InsertReaction(reaction Reaction) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	lastId, _ := result.LastInsertId()
+	lastId,_ := result.LastInsertId()
 	return lastId, nil
 
 }
-func DeleteReaction(userId, postId int) error {
-	query := "DELETE FROM likes_dislikes WHERE user_id = ? AND post_id = ?"
-	_, err := database.DB.Exec(query, userId, postId)
-	if err != nil {
-		return err
-	}
-	return nil
+func DeleteReaction(userId int,postID int,commentID *int) error{
+	query:=`DELETE FROM likes_dislikes WHERE user_id=? AND post_id=? AND comment_id IS ?`
+	_,err:=database.DB.Exec(query,userId,postID,commentID)
+	return err 
 }
 
-func CheckReactionByUser(userId, postId int) (bool, error) {
-	exist := 0
-	query := "SELECT COUNT(*) FROM likes_dislikes WHERE user_id = ? AND post_id = ?"
-	err := database.DB.QueryRow(query, userId, postId).Scan(&exist)
-	if err != nil {
-		return false, err
+func CheckReactionByUser(userId int,postID int,commentID *int) (string,error) {
+	query:=`SELECT type FROM likes_dislikes WHERE likes_dislikes.user_id=? and likes_dislikes.post_id=? and likes_dislikes.comment_id IS ?`
+	row:=database.DB.QueryRow(query,userId,postID,commentID)
+	var reactionType string
+	err:=row.Scan(&reactionType)
+	if err!=nil{
+		return "",nil 
 	}
-	if exist == 0 {
-		return false, nil
-	}
-	return true, nil
-}
-
-func GetReactionByUser(userId, postId int) (string, error) {
-	reactionType := ""
-	query := "SELECT type FROM likes_dislikes WHERE user_id = ? AND post_id = ? LIMIT 1"
-	err := database.DB.QueryRow(query, userId, postId).Scan(&reactionType)
-	if err != nil {
-		return "", nil // pas de réaction trouvée
-	}
-	return reactionType, nil
+	return reactionType,nil
 }
 func CountLikeDislikeByPost(postId int, Type string) (int, error) {
 	count := 0
@@ -61,4 +46,23 @@ func CountLikeDislikeByPost(postId int, Type string) (int, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func CountLikesByComments(commentID int,post_id int,Type string)(int,error){
+	count:=0
+	query:=`SELECT COUNT(*) FROM likes_dislikes WHERE post_id=? AND comment_id=? AND type=?`
+	err:=database.DB.QueryRow(query,post_id,commentID,Type).Scan(&count)
+	if err!=nil{
+		return 0,err
+	}
+	return count,nil 
+}
+func GetReactionByUser(userId, postId int) (string, error) {
+	reactionType := ""
+	query := "SELECT type FROM likes_dislikes WHERE user_id = ? AND post_id = ? LIMIT 1"
+	err := database.DB.QueryRow(query, userId, postId).Scan(&reactionType)
+	if err != nil {
+		return "", nil // pas de réaction trouvée
+	}
+	return reactionType, nil
 }
