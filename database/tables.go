@@ -17,7 +17,6 @@ func TableCreation() {
 			title VARCHAR,
 			content TEXT,
 			user_id INTEGER NOT NULL,
-			image TEXT, 
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 	)`,

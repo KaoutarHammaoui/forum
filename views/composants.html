@@ -76,12 +76,6 @@
       </div>
     </div>
 
-    <!-- POST IMAGE -->
-    {{ if .Image }}
-    <div class="post-image-container">
-      <img class="post-image" src="/{{ .Image }}" alt="post image">
-    </div>
-    {{ end }}
 
     <!-- POST BODY -->
     <div class="post-body">
@@ -260,21 +254,6 @@
     <div class="field">
       <label for="post-content">Content</label>
       <textarea id="post-content" name="content" placeholder="Write your post content here..."></textarea>
-    </div>
-
-    <div class="field">
-      <label>Image</label>
-      <div class="file-zone" id="drop-zone">
-        <input type="file" name="image" accept="image/*" id="file-input" />
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <polyline points="21 15 16 10 5 21" />
-        </svg>
-        <p>Click to upload or drag &amp; drop</p>
-        <p class="file-hint">PNG, JPG — max 5MB</p>
-        <p class="file-name" id="file-name"></p>
-      </div>
     </div>
 
     <div class="field">

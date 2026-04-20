@@ -11,7 +11,6 @@ func Route() {
 
 	// Assets Routes
 	http.HandleFunc("/static/", handlers.StaticHandler)
-	http.HandleFunc("/uploads/", handlers.UploadsHandler)
 
 	// Home Route
 	http.HandleFunc("/", handlers.Home)

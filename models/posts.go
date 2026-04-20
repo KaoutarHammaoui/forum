@@ -10,7 +10,6 @@ type Post struct {
 	Title     string
 	Content   string
 	UserId    int
-	Image     string
 	UserName  string
 	Comments  []Comments
 	Likes     int
@@ -19,8 +18,8 @@ type Post struct {
 }
 
 func InsertPost(post Post) (int64, error) {
-	query := "INSERT INTO posts (title, content, user_id, image) VALUES (?, ?, ?, ?)"
-	result, err := database.DB.Exec(query, post.Title, post.Content, post.UserId, post.Image)
+	query := "INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)"
+	result, err := database.DB.Exec(query, post.Title, post.Content, post.UserId)
 	if err != nil {
 		return 0, err
 	}
@@ -33,7 +32,7 @@ func InsertPost(post Post) (int64, error) {
 
 func GetAllPosts() ([]Post, error) {
 	posts := []Post{}
-	query := `SELECT posts.id, posts.title, posts.content, posts.user_id, posts.image, posts.created_at, users.username
+	query := `SELECT posts.id, posts.title, posts.content, posts.user_id, posts.created_at, users.username
               FROM posts
               INNER JOIN users
               ON posts.user_id = users.id`
@@ -46,7 +45,7 @@ func GetAllPosts() ([]Post, error) {
 
 	for lignes.Next() {
 		post := Post{}
-		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.Image, &post.CreatedAt, &post.UserName)
+		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.CreatedAt, &post.UserName)
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +61,7 @@ func GetAllPosts() ([]Post, error) {
 
 func GetPostsByCategory(idcat int) ([]Post, error) {
 	posts := []Post{}
-	query := `SELECT p.id, p.title, p.content, p.user_id, p.image, p.created_at, u.username
+	query := `SELECT p.id, p.title, p.content, p.user_id, p.created_at, u.username
 			  FROM posts p
 			  INNER JOIN post_category pc ON p.id = pc.post_id
 			  INNER JOIN users u ON p.user_id = u.id
@@ -76,7 +75,7 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 
 	for lignes.Next() {
 		post := Post{}
-		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.Image, &post.CreatedAt, &post.UserName)
+		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.CreatedAt, &post.UserName)
 		if err != nil {
 			return nil, err
 		}
