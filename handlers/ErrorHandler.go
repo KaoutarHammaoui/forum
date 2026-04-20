@@ -7,9 +7,9 @@ import (
 
 func HandleError(w http.ResponseWriter, message string, status int) {
 	w.WriteHeader(status)
-	data := map[string]string{
-		"Error":  message,
-		"Status": http.StatusText(status),
+	data := homeError{
+		Error:  message,
+		Status: status,
 	}
 	config.RenderTemplate(w, "error.html", data)
 }

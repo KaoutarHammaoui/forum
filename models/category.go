@@ -24,23 +24,10 @@ func GetAllCategory() ([]Category, error) {
 		}
 		categories = append(categories, category)
 	}
-
 	if err := lignes.Err(); err != nil {
 		return nil, err
 	}
-
 	return categories, nil
-}
-
-func GetCategoryByName(name string) (Category, error) {
-	category := Category{}
-	query := "SELECT id FROM category WHERE name = ?"
-	row := database.DB.QueryRow(query, name)
-	err := row.Scan(&category.IdCat)
-	if err != nil {
-		return Category{}, err
-	}
-	return category, nil
 }
 
 func InsertPostCategory(postID int64, categoryID int) error {
