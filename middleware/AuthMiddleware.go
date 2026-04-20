@@ -2,10 +2,9 @@ package middleware
 
 import (
 	"context"
+	"forum/models"
 	"net/http"
 	"time"
-
-	"forum/models"
 )
 
 type contextKey string
@@ -14,13 +13,13 @@ const UserIdKey contextKey = "userID"
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//prevent browser to store
+		// prevent browser to store
 		w.Header().Set("Cache-Control", "no-store,no-cache,must-revalidate, private")
 		w.Header().Set("Pragma", "no-cache")
 
 		cookie, err := r.Cookie("token")
 		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
@@ -40,4 +39,17 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		cts := context.WithValue(r.Context(), UserIdKey, session.UserId)
 		next(w, r.WithContext(cts))
 	}
+}
+func GetSession(r *http.Request) (*models.Session, error) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		return nil, err
+	}
+
+	session, err := models.GetSessionByToken(cookie.Value)
+	if err != nil {
+		return nil, err
+	}
+
+	return &session, nil
 }

@@ -16,7 +16,7 @@ func Route() {
 	//Home Route :
 	http.HandleFunc("/", handlers.Home)
 
-	//Register Routes:
+	//Register Routes: 
 	http.HandleFunc("/register", handlers.RegisterHandler)
 	http.HandleFunc("/do-register", handlers.DoRegisterHandler)
 
@@ -34,4 +34,8 @@ func Route() {
 	http.Handle("/createPost",
 		middleware.RateLimiter(middleware.AuthMiddleware(http.HandlerFunc(handlers.CreatePost))))
 
+	//comments
+	http.Handle("/SubmitComment",middleware.RateLimiter(middleware.AuthMiddleware(http.HandlerFunc(handlers.AddComment))))	
+	//reactions
+	http.Handle("/reactions", middleware.AuthMiddleware(handlers.ReactPost))
 }

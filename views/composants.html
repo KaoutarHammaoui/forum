@@ -100,21 +100,36 @@
 
         <!-- REACTIONS + COMMENTS TOGGLE -->
         <div class="post-reactions">
-            <button class="reaction-btn like-btn" data-post-id="{{ .IdPost }}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                <span>Like</span>
-            </button>
+            {{ $url    := "" }}
+            {{ $method := "" }}
 
-            <button class="reaction-btn dislike-btn" data-post-id="{{ .IdPost }}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
-                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
-                </svg>
-                <span>Dislike</span>
-            </button>
+            {{ if eq $.Action "/" }}
+                {{ $url = "/login" }}    {{ $method = "get" }}
+            {{ else if eq $.Action "/homeUser" }}
+                {{ $url = "/reactions" }}    {{ $method = "post" }}
+            {{ end }}
 
+            <form action="{{ $url }}" method="{{ $method }}" class="post-reactions">
+                <input type="hidden" name="post_id" value="{{ .IdPost }}">
+                <input type="hidden" name="redirect" value="{{ $.Action}}">
+
+                <button type="submit"  name="type" value="like" class="reaction-btn like-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span class="reaction-label">Like</span>
+                    <span class="reaction-count">{{ .Likes }}</span>
+                </button>
+
+                <button type="submit" name="type" value="dislike" class="reaction-btn dislike-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+                        <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                    </svg>
+                    <span class="reaction-label">Dislike</span>
+                    <span class="reaction-count">{{ .Dislikes }}</span>
+                </button>
+            </form>
             <!-- CHECKBOX COMMENTS TOGGLE (CSS-only) -->
             <input type="checkbox" class="comment-toggle" id="comments-{{ .IdPost }}">
             <label class="comment-toggle-btn" for="comments-{{ .IdPost }}">
@@ -131,10 +146,12 @@
 
                     <div class="comments-header">
                         <h4 class="comments-title">Comments</h4>
-                        <span class="comments-count" data-post-id="{{ .IdPost }}">0</span>
+                        <span class="comments-count" data-post-id="{{ .IdPost }}">{{len .Comments}}</span>
                     </div>
-
                     <!-- Écrire un commentaire -->
+                     {{if $.IsLogged}}
+                     <form action="/SubmitComment" method="post">
+                        <input type="hidden" name="post_id" value="{{.IdPost}}">
                     <div class="write-comment">
                     <div class="post-avatar">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -143,18 +160,36 @@
                         </svg>
                                 
                     </div>                        <div class="comment-input-wrap">
-                            <textarea class="comment-input" placeholder="Écrire un commentaire..." rows="2"></textarea>
+                            <textarea name="content" class="comment-input" placeholder="Écrire un commentaire..." rows="2"></textarea>
                             <div class="comment-actions">
                                 <button class="submit-comment-btn" data-post-id="{{ .IdPost }}">Publier</button>
                             </div>
                         </div>
                     </div>
-
+                    </form>
+                    {{else}}
+                        <p><a href="/login" class="login-to-comment">login</a> to comment :></p>
+                    {{end}}    
                     <!-- Liste des commentaires -->
-                    <div class="comments-list" data-post-id="{{ .IdPost }}">
+                   <div class="comments-list" data-post-id="{{ .IdPost }}">
+                    {{ if not .Comments }}
                         <div class="no-comments">Soyez le premier à commenter...</div>
-                    </div>
+                    {{ end }}
 
+                    {{ range .Comments }}
+                        <div class="comment-item">
+                            <div class="post-avatar">
+                                {{ slice .Username 0 1 }}
+                            </div>
+                            <div class="comment-body">
+                                <div class="comment-top">
+                                    <span class="comment-author">@{{ .Username }}</span>
+                                </div>
+                                <p class="comment-text">{{ .Content }}</p>
+                            </div>
+                        </div>
+                    {{ end }}
+                </div>
                 </div>
             </div>
         </div>

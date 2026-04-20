@@ -2,6 +2,7 @@ package models
 
 import (
 	"forum/database"
+	
 	"time"
 )
 
@@ -12,6 +13,8 @@ type Comments struct {
 	Content   string
 	CreatedAt time.Time
 	Username  string
+	Likes     int
+	Dislikes  int
 }
 
 func InsertComment(c Comments) error {
@@ -57,6 +60,5 @@ func GetCommentsByPost(postID int) ([]Comments, error) {
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-
 	return comments, nil
 }

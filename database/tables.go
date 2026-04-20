@@ -64,34 +64,13 @@ func TableCreation() {
 	)`,
 	}
 	for _, query := range queries {
-		prep, err := DB.Prepare(query) // to avoid sql injections
+		prep, err := DB.Prepare(query)
 		if err != nil {
 			log.Fatal(err)
 		}
 		_, err = prep.Exec()
 		if err != nil {
 			log.Fatal(err)
-		}
-	}
-	seedQueries := []string{
-		// USERS
-		`INSERT OR IGNORE INTO users (id, username, email, password) VALUES
-		(1, 'oumaima', 'oumaima@mail.com', '1234'),
-		(2, 'kaoutar', 'kaoutar@mail.com', '1234'),
-		(3, 'admin', 'admin@mail.com', '1234')`,
-
-		// CATEGORY
-		`INSERT OR IGNORE INTO category (id, name) VALUES
-		(1, 'Technologie'),
-		(2, 'Science'),
-		(3, 'Art')`,
-	}
-
-	// INSERT DATA
-	for _, query := range seedQueries {
-		_, err := DB.Exec(query)
-		if err != nil {
-			log.Println("Seed error:", err)
 		}
 	}
 

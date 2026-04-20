@@ -34,14 +34,15 @@ func GetAllCategory() ([]Category, error) {
 
 func GetCategoryByName(name string) (Category, error) {
 	category := Category{}
-	query := "SELECT id, name FROM category WHERE name = ?"
+	query := "SELECT id FROM category WHERE name = ?"
 	row := database.DB.QueryRow(query, name)
-	err := row.Scan(&category.IdCat, &category.Name)
+	err := row.Scan(&category.IdCat)
 	if err != nil {
 		return Category{}, err
 	}
 	return category, nil
 }
+
 func InsertPostCategory(postID int64, categoryID int) error {
 	_, err := database.DB.Exec("INSERT INTO post_category (post_id, category_id) VALUES (?, ?)", postID, categoryID)
 	return err
