@@ -32,7 +32,6 @@ func TemplateParse() error {
 		Templates[name] = tmpl
 	}
 
-	log.Printf("Parsed %d templates successfully\n", len(Templates))
 	return nil
 }
 
