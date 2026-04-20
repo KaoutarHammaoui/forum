@@ -31,6 +31,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	data := Data{}
 	data.Categories = categories
+	data.SelectedCategories = map[string]bool{"all": true}
 
 	if r.Method == http.MethodGet {
 		posts, err := models.GetAllPosts()
@@ -71,6 +72,10 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		}
 
 		selectedCats := r.Form["category"]
+		data.SelectedCategories = make(map[string]bool, len(selectedCats))
+		for _, category := range selectedCats {
+			data.SelectedCategories[category] = true
+		}
 
 		isAll := false
 		for _, c := range selectedCats {
@@ -81,6 +86,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if isAll || len(selectedCats) == 0 {
+			data.SelectedCategories["all"] = true
 			posts, err := models.GetAllPosts()
 			if err != nil {
 				HandleError(w, "Internal Server Error", http.StatusInternalServerError)

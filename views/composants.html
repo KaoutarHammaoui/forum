@@ -17,7 +17,7 @@
   <div class="filter-block">
     <span class="filter-group-label">Categories</span>
     <label class="cat-item">
-      <input type="checkbox" name="category" value="all" id="cat-all" />
+      <input type="checkbox" name="category" value="all" id="cat-all" {{if index .SelectedCategories "all"}}checked{{end}} />
       <span class="check-box">
         <svg class="check-icon" viewBox="0 0 10 10" fill="none">
           <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -28,7 +28,7 @@
     <div class="cat-divider"></div>
     {{ range .Categories }}
     <label class="cat-item">
-      <input type="checkbox" name="category" value="{{ .IdCat }}" />
+      <input type="checkbox" name="category" value="{{ .IdCat }}" {{if index $.SelectedCategories (printf "%d" .IdCat)}}checked{{end}} />
       <span class="check-box">
         <svg class="check-icon" viewBox="0 0 10 10" fill="none">
           <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -38,6 +38,29 @@
     </label>
     {{ end }}
   </div>
+  {{if eq .Action "/homeUser"}}
+  <div class="filter-block">
+    <span class="filter-group-label">Activity</span>
+    <label class="cat-item">
+      <input type="checkbox" name="activity" value="liked" {{if .FilterLikes}}checked{{end}} />
+      <span class="check-box">
+        <svg class="check-icon" viewBox="0 0 10 10" fill="none">
+          <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="cat-label">Liked posts</span>
+    </label>
+    <label class="cat-item">
+      <input type="checkbox" name="activity" value="owned" {{if .FilterMyPosts}}checked{{end}} />
+      <span class="check-box">
+        <svg class="check-icon" viewBox="0 0 10 10" fill="none">
+          <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="cat-label">My posts</span>
+    </label>
+  </div>
+  {{end}}
   <button type="submit" class="apply-btn">Apply filters</button>
 </form>
 

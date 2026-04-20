@@ -10,11 +10,14 @@ type Login struct {
 }
 
 type Data struct {
-	Posts      []models.Post
-	Categories []models.Category
-	Error      string
-	Action     string
-	IsLogged   bool
+	Posts              []models.Post
+	Categories         []models.Category
+	Error              string
+	Action             string
+	IsLogged           bool
+	SelectedCategories map[string]bool
+	FilterLikes        bool
+	FilterMyPosts      bool
 }
 
 type RegistrationData struct {

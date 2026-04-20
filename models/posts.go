@@ -1,8 +1,9 @@
 package models
 
 import (
-	"time"
 	"forum/database"
+	"strings"
+	"time"
 )
 
 type Post struct {
@@ -84,6 +85,72 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 	}
 
 	if err := lignes.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func GetFilteredPosts(userID int, selectedCats []string, filterLikes, filterMyPosts bool) ([]Post, error) {
+	var posts []Post
+
+	query := `SELECT DISTINCT p.id, p.title, p.content, p.user_id, p.image, p.created_at, u.username
+              FROM posts p
+              INNER JOIN users u ON p.user_id = u.id`
+
+	var conditions []string
+	var args []interface{}
+
+	if filterLikes {
+		query += " INNER JOIN likes_dislikes ld ON p.id = ld.post_id"
+		conditions = append(conditions, "ld.user_id = ? AND ld.type = ?")
+		args = append(args, userID, "like")
+	}
+
+	filteredCats := make([]string, 0, len(selectedCats))
+	for _, cat := range selectedCats {
+		if cat != "all" {
+			filteredCats = append(filteredCats, cat)
+		}
+	}
+	if len(filteredCats) > 0 {
+		query += " INNER JOIN post_category pc ON p.id = pc.post_id"
+
+		placeholders := make([]string, 0, len(filteredCats))
+		for _, cat := range filteredCats {
+			placeholders = append(placeholders, "?")
+			args = append(args, cat)
+		}
+		conditions = append(conditions, "pc.category_id IN ("+strings.Join(placeholders, ",")+")")
+	}
+
+	if filterMyPosts {
+		conditions = append(conditions, "p.user_id = ?")
+		args = append(args, userID)
+	}
+
+	if len(conditions) > 0 {
+		query += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	query += " ORDER BY p.created_at DESC"
+
+	rows, err := database.DB.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p Post
+		err := rows.Scan(&p.IdPost, &p.Title, &p.Content, &p.UserId, &p.Image, &p.CreatedAt, &p.UserName)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 

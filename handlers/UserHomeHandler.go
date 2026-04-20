@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"forum/config"
+	"forum/middleware"
 	"forum/models"
 	"net/http"
-	"strconv"
 )
 
 func HomeUser(w http.ResponseWriter, r *http.Request) {
@@ -15,6 +15,7 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 
 	data := Data{}
 	data.IsLogged = true
+	data.SelectedCategories = map[string]bool{"all": true}
 
 	categories, err := models.GetAllCategory()
 	if err != nil {
@@ -24,6 +25,11 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 	data.Categories = categories
 
 	var posts []models.Post
+	userID, ok := r.Context().Value(middleware.UserIdKey).(int)
+	if !ok {
+		HandleError(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	if r.Method == http.MethodGet {
 		posts, err = models.GetAllPosts()
@@ -32,40 +38,49 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		r.ParseForm()
-		selectedCats := r.Form["category"]
+		err := r.ParseForm()
+		if err != nil {
+			HandleError(w, "Bad Request", http.StatusBadRequest)
+			return
+		}
 
-		isAll := false
-		for _, v := range selectedCats {
-			if v == "all" {
-				isAll = true
+		selectedCats := r.Form["category"]
+		data.SelectedCategories = make(map[string]bool, len(selectedCats))
+		for _, category := range selectedCats {
+			data.SelectedCategories[category] = true
+		}
+		for _, activity := range r.Form["activity"] {
+			if activity == "liked" {
+				data.FilterLikes = true
+			}
+			if activity == "owned" {
+				data.FilterMyPosts = true
+			}
+		}
+
+		hasSpecificCategory := false
+		for _, category := range selectedCats {
+			if category != "all" {
+				hasSpecificCategory = true
 				break
 			}
 		}
 
-		if isAll || len(selectedCats) == 0 {
+		if !hasSpecificCategory {
+			data.SelectedCategories["all"] = true
+		}
+
+		if !data.FilterLikes && !data.FilterMyPosts && !hasSpecificCategory {
 			posts, err = models.GetAllPosts()
 			if err != nil {
 				HandleError(w, "Error loading posts", http.StatusInternalServerError)
 				return
 			}
 		} else {
-			postMap := map[int]models.Post{}
-			for _, catStr := range selectedCats {
-				catId, err := strconv.Atoi(catStr)
-				if err != nil {
-					continue
-				}
-				catPosts, err := models.GetPostsByCategory(catId)
-				if err != nil {
-					continue
-				}
-				for _, p := range catPosts {
-					postMap[p.IdPost] = p
-				}
-			}
-			for _, p := range postMap {
-				posts = append(posts, p)
+			posts, err = models.GetFilteredPosts(userID, selectedCats, data.FilterLikes, data.FilterMyPosts)
+			if err != nil {
+				HandleError(w, "Error loading filtered posts", http.StatusInternalServerError)
+				return
 			}
 		}
 	}
