@@ -52,6 +52,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		renderCreateError(w, r, "Please select at least one category.")
 		return
 	}
+
 	// User
 	userID, ok := r.Context().Value(middleware.UserIdKey).(int)
 	if !ok {
@@ -95,7 +96,6 @@ func renderCreateError(w http.ResponseWriter, r *http.Request, msg string) {
 	if err == nil {
 		data.Categories = categories
 	}
-
 	posts, err := models.GetAllPosts()
 	if err == nil {
 		data.Posts = posts

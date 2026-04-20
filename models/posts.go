@@ -36,7 +36,7 @@ func GetAllPosts() ([]Post, error) {
 	query := `SELECT posts.id, posts.title, posts.content, posts.user_id, posts.created_at, users.username
               FROM posts
               INNER JOIN users
-              ON posts.user_id = users.id`
+              ON posts.user_id = users.id ORDER BY posts.created_at DESC `
 
 	lignes, err := database.DB.Query(query)
 	if err != nil {
@@ -76,7 +76,7 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 
 	for lignes.Next() {
 		post := Post{}
-		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.CreatedAt, &post.UserName)
+		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId,  &post.CreatedAt, &post.UserName)
 		if err != nil {
 			return nil, err
 		}
