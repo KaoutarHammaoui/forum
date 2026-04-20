@@ -9,11 +9,20 @@ import (
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		HandleError(w, "Not Found", http.StatusNotFound)
+		return
+	}
+	if r.Method != http.MethodGet && r.Method != http.MethodPost {
+		HandleError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	session, err := middleware.GetSession(r)
 	if err == nil && session != nil {
 		http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
 		return
 	}
+
 	categories, err := models.GetAllCategory()
 	if err != nil {
 		HandleError(w, "Internal Server Error", http.StatusInternalServerError)
@@ -24,7 +33,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	data.Categories = categories
 
 	if r.Method == http.MethodGet {
-
 		posts, err := models.GetAllPosts()
 		if err != nil {
 			HandleError(w, "Internal Server Error", http.StatusInternalServerError)
@@ -33,7 +41,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		for i, p := range posts {
 			countlikes, err := models.CountLikeDislikeByPost(p.IdPost, "like")
 			if err != nil {
-
+				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			posts[i].Likes = countlikes
@@ -44,28 +52,34 @@ func Home(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			posts[i].Dislikes = Countdislikes
+
 			comments, err := models.GetCommentsByPost(p.IdPost)
 			if err != nil {
 				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			posts[i].Comments = comments
-
 		}
 
 		data.Posts = posts
 
 	} else if r.Method == http.MethodPost {
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			HandleError(w, "Bad Request", http.StatusBadRequest)
+			return
+		}
+
 		selectedCats := r.Form["category"]
 
 		isAll := false
-		for _, v := range selectedCats {
-			if v == "all" {
+		for _, c := range selectedCats {
+			if c == "all" {
 				isAll = true
 				break
 			}
 		}
+
 		if isAll || len(selectedCats) == 0 {
 			posts, err := models.GetAllPosts()
 			if err != nil {
@@ -78,12 +92,15 @@ func Home(w http.ResponseWriter, r *http.Request) {
 			for _, catStr := range selectedCats {
 				catId, err := strconv.Atoi(catStr)
 				if err != nil {
-					continue
+					HandleError(w, "Invalid category id", http.StatusBadRequest)
+					return
 				}
 				posts, err := models.GetPostsByCategory(catId)
 				if err != nil {
-					continue
+					HandleError(w, "Internal Server Error", http.StatusInternalServerError)
+					return
 				}
+
 				for _, p := range posts {
 					postMap[p.IdPost] = p
 				}
@@ -92,9 +109,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 				data.Posts = append(data.Posts, p)
 			}
 		}
-	} else {
-		HandleError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
 	}
 	data.Action = "/"
 	config.RenderTemplate(w, "home.html", data)

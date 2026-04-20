@@ -26,3 +26,8 @@ type RegistrationData struct {
 	PasswordError string
 	HasErrors     bool
 }
+
+type homeError struct {
+	Error string
+	Status int
+}

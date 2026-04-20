@@ -35,6 +35,7 @@ func TemplateParse() error {
 	log.Printf("Parsed %d templates successfully\n", len(Templates))
 	return nil
 }
+
 func GetTemplate(name string) *template.Template {
 	if tmpl, exists := Templates[name]; exists {
 		return tmpl

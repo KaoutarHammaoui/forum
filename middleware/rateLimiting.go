@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	// "forum/handlers"
 )
 
 type requests struct {
@@ -34,15 +33,15 @@ func RateLimiter(next http.Handler) http.Handler {
 			if v.count >= 20 {
 				mu.Unlock()
 				w.WriteHeader(429)
-				data:=map[string]string{
-					"Error": "Too manny requests, Tty after 1min",
-					"Status":http.StatusText(429),
+				data := map[string]string{
+					"Error":  "Too manny requests, Tty after 1min",
+					"Status": http.StatusText(429),
 				}
-				config.RenderTemplate(w,"error.html",data)
-				return 
+				config.RenderTemplate(w, "error.html", data)
+				return
 			}
 			v.count++
-			} else {
+		} else {
 			v.count = 1
 			v.lastSenn = time.Now()
 		}

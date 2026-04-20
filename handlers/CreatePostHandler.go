@@ -24,7 +24,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(10 << 20); err != nil {
+	if err := r.ParseMultipartForm(5 << 20); err != nil {
 		renderCreateError(w, r, "Invalid form data.")
 		return
 	}
@@ -69,7 +69,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	ext := strings.ToLower(filepath.Ext(handler.Filename))
 	if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
-		renderCreateError(w, r, "Image must be a JPG or PNG file.")
+		renderCreateError(w, r, "Image must be a JPG or JPEG or PNG file.")
 		return
 	}
 
