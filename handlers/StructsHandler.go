@@ -13,8 +13,10 @@ type Data struct {
 	Posts        []models.Post
 	Categories   []models.Category
 	Error        string
+	CommentError string
 	Action       string
 	IsLogged     bool
+	ErrorPostId int
 }
 
 type RegistrationData struct {

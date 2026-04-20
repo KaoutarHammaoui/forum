@@ -33,6 +33,7 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		r.ParseForm()
+
 		selectedCats := r.Form["category"]
 
 		isAll := false
@@ -78,7 +79,25 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 
 	data.Posts = posts
 	data.Action = "/homeUser"
-	config.RenderTemplate(w, "homeUser.html", data)
+	data.Posts = posts
+data.Action = "/homeUser"
+
+cookie, err := r.Cookie("comment_error")
+if err == nil {
+    postId, err := strconv.Atoi(cookie.Value)
+    if err == nil {
+        data.CommentError = "Comment cannot be empty"
+        data.ErrorPostId = postId
+    }
+    http.SetCookie(w, &http.Cookie{
+        Name:   "comment_error",
+        Value:  "",
+        Path:   "/",
+        MaxAge: -1,
+    })
+}
+
+config.RenderTemplate(w, "homeUser.html", data)
 }
 
 func GetInfoPosts(w http.ResponseWriter, posts []models.Post) ([]models.Post, error) {

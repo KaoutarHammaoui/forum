@@ -132,7 +132,7 @@
       </form>
 
       <!-- CHECKBOX COMMENTS TOGGLE (CSS-only) -->
-      <input type="checkbox" class="comment-toggle" id="comments-{{ .IdPost }}">
+      <input type="checkbox" class="comment-toggle" id="comments-{{ .IdPost }}" {{if and $.CommentError (eq .IdPost $.ErrorPostId)}}checked{{end}}>
       <label class="comment-toggle-btn" for="comments-{{ .IdPost }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -162,11 +162,22 @@
                 </svg>
               </div>
               <div class="comment-input-wrap">
-                <textarea name="content" class="comment-input" placeholder="Écrire un commentaire..." rows="2"></textarea>
+                <textarea name="Commentcontent" class="comment-input" placeholder="Écrire un commentaire..." rows="2"> </textarea>
+                  
+               
                 <div class="comment-actions">
                   <button class="submit-comment-btn" data-post-id="{{ .IdPost }}">Publier</button>
                 </div>
               </div>
+           <style>
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to   { opacity: 0; }
+            }
+           </style>
+                  {{if and $.CommentError (eq .IdPost $.ErrorPostId)}}
+                    <p style="color: red;animation: fadeOut 1s ease 20s forwards; font-size: 15px;">comment cannot be empty</p>
+                  {{end}}  
             </div>
           </form>
           {{else}}
