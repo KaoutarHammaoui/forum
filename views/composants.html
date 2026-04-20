@@ -8,8 +8,7 @@
 {{end}}
 
 {{define "ListCategorie"}}
-<form method="POST" action="{{.Action}}" id="clearForm">
-    <input type="hidden" name="_method" value="DELETE">
+<form method="GET" action="{{.Action}}" id="clearForm">
   <div class="sidebar-top">
     <span class="sidebar-label">Filters</span>
     <button type="button" class="clear-btn" onclick="clearFilters()">Reset</button>
@@ -255,7 +254,7 @@
 <input type="checkbox" class="excerpt-toggle" id="form-more-toggle" />
 {{end}}
 
-<form action="/createPost" method="POST" enctype="multipart/form-data">
+<form action="/createPost" method="POST">
   <p class="form-subtitle" >New publication</p>
   <br />
 

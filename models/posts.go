@@ -2,7 +2,7 @@ package models
 
 import (
 	"forum/database"
-	"strings"
+	"sort"
 	"time"
 )
 
@@ -76,7 +76,7 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 
 	for lignes.Next() {
 		post := Post{}
-		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId,  &post.CreatedAt, &post.UserName)
+		err := lignes.Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.CreatedAt, &post.UserName)
 		if err != nil {
 			return nil, err
 		}
@@ -89,69 +89,99 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 
 	return posts, nil
 }
-
 func GetFilteredPosts(userID int, selectedCats []string, filterLikes, filterMyPosts bool) ([]Post, error) {
-	var posts []Post
+	seen := map[int]bool{}
+	allPosts := []Post{}
 
-	query := `SELECT DISTINCT p.id, p.title, p.content, p.user_id, p.created_at, u.username
-              FROM posts p
-              INNER JOIN users u ON p.user_id = u.id`
-
-	var conditions []string
-	var args []interface{}
-
-	if filterLikes {
-		query += " INNER JOIN likes_dislikes ld ON p.id = ld.post_id"
-		conditions = append(conditions, "ld.user_id = ? AND ld.type = ?")
-		args = append(args, userID, "like")
+	addPosts := func(posts []Post) {
+		for _, p := range posts {
+			if !seen[p.IdPost] {
+				seen[p.IdPost] = true
+				allPosts = append(allPosts, p)
+			}
+		}
 	}
 
-	filteredCats := make([]string, 0, len(selectedCats))
+	// Filtre catégories
 	for _, cat := range selectedCats {
-		if cat != "all" {
-			filteredCats = append(filteredCats, cat)
+		if cat == "all" {
+			continue
 		}
-	}
-	if len(filteredCats) > 0 {
-		query += " INNER JOIN post_category pc ON p.id = pc.post_id"
-
-		placeholders := make([]string, 0, len(filteredCats))
-		for _, cat := range filteredCats {
-			placeholders = append(placeholders, "?")
-			args = append(args, cat)
-		}
-		conditions = append(conditions, "pc.category_id IN ("+strings.Join(placeholders, ",")+")")
-	}
-
-	if filterMyPosts {
-		conditions = append(conditions, "p.user_id = ?")
-		args = append(args, userID)
-	}
-
-	if len(conditions) > 0 {
-		query += " WHERE " + strings.Join(conditions, " AND ")
-	}
-
-	query += " ORDER BY p.created_at DESC"
-
-	rows, err := database.DB.Query(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var p Post
-		err := rows.Scan(&p.IdPost, &p.Title, &p.Content, &p.UserId, &p.CreatedAt, &p.UserName)
+		rows, err := database.DB.Query(`
+			SELECT DISTINCT p.id, p.title, p.content, p.user_id, p.created_at, u.username
+			FROM posts p
+			INNER JOIN users u ON p.user_id = u.id
+			INNER JOIN post_category pc ON p.id = pc.post_id
+			WHERE pc.category_id = ?
+			ORDER BY p.created_at DESC`, cat)
 		if err != nil {
 			return nil, err
 		}
-		posts = append(posts, p)
+		var posts []Post
+		for rows.Next() {
+			var p Post
+			if err := rows.Scan(&p.IdPost, &p.Title, &p.Content, &p.UserId, &p.CreatedAt, &p.UserName); err != nil {
+				rows.Close()
+				return nil, err
+			}
+			posts = append(posts, p)
+		}
+		rows.Close()
+		addPosts(posts)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
+	// Filtre liked posts
+	if filterLikes {
+		rows, err := database.DB.Query(`
+			SELECT DISTINCT p.id, p.title, p.content, p.user_id, p.created_at, u.username
+			FROM posts p
+			INNER JOIN users u ON p.user_id = u.id
+			INNER JOIN likes_dislikes ld ON p.id = ld.post_id
+			WHERE ld.user_id = ? AND ld.type = ?
+			ORDER BY p.created_at DESC`, userID, "like")
+		if err != nil {
+			return nil, err
+		}
+		var posts []Post
+		for rows.Next() {
+			var p Post
+			if err := rows.Scan(&p.IdPost, &p.Title, &p.Content, &p.UserId, &p.CreatedAt, &p.UserName); err != nil {
+				rows.Close()
+				return nil, err
+			}
+			posts = append(posts, p)
+		}
+		rows.Close()
+		addPosts(posts)
 	}
 
-	return posts, nil
+	// Filtre my posts
+	if filterMyPosts {
+		rows, err := database.DB.Query(`
+			SELECT p.id, p.title, p.content, p.user_id, p.created_at, u.username
+			FROM posts p
+			INNER JOIN users u ON p.user_id = u.id
+			WHERE p.user_id = ?
+			ORDER BY p.created_at DESC`, userID)
+		if err != nil {
+			return nil, err
+		}
+		var posts []Post
+		for rows.Next() {
+			var p Post
+			if err := rows.Scan(&p.IdPost, &p.Title, &p.Content, &p.UserId, &p.CreatedAt, &p.UserName); err != nil {
+				rows.Close()
+				return nil, err
+			}
+			posts = append(posts, p)
+		}
+		rows.Close()
+		addPosts(posts)
+	}
+
+	sort.Slice(allPosts, func(i, j int) bool {
+		return allPosts[i].CreatedAt.After(allPosts[j].CreatedAt)
+	})
+
+	return allPosts, nil
 }

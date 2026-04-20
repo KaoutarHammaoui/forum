@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"forum/config"
 	"forum/middleware"
 	"forum/models"
@@ -18,15 +19,19 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		renderCreateError(w, r, err.Error())
-		return
+	r.ParseForm()
+
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Println("Parse error:", err)
 	}
 
+	fmt.Println("FULL FORM:", r.Form)
+	fmt.Println("TITLE:", r.FormValue("title"))
 	title := strings.TrimSpace(r.FormValue("title"))
 	content := strings.TrimSpace(r.FormValue("content"))
 	categories := r.Form["categories"]
-
+	fmt.Println("test", title)
 	// Title validation
 	if title == "" {
 		renderCreateError(w, r, "Title is required.")

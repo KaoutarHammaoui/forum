@@ -13,10 +13,11 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, "Not Found", http.StatusNotFound)
 		return
 	}
-	if r.Method != http.MethodGet && r.Method != http.MethodPost {
+	if r.Method != http.MethodGet {
 		HandleError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
 	session, err := middleware.GetSession(r)
 	if err == nil && session != nil {
 		http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
@@ -32,90 +33,81 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	data := Data{}
 	data.Categories = categories
 	data.SelectedCategories = map[string]bool{"all": true}
+	data.Action = "/"
 
-	if r.Method == http.MethodGet {
-		posts, err := models.GetAllPosts()
+	// Map des catégories valides
+	validCats := map[string]bool{}
+	for _, cat := range categories {
+		validCats[strconv.Itoa(cat.IdCat)] = true
+	}
+
+	selectedCats := r.URL.Query()["category"]
+
+	hasAll := false
+	hasSpecificCat := false
+	filteredCats := []string{}
+
+	for _, cat := range selectedCats {
+		if cat == "all" {
+			hasAll = true
+		} else {
+			if !validCats[cat] {
+				HandleError(w, "Bad Request", http.StatusBadRequest)
+				return
+			}
+			hasSpecificCat = true
+			filteredCats = append(filteredCats, cat)
+		}
+	}
+
+	data.SelectedCategories = make(map[string]bool)
+	if hasAll {
+		data.SelectedCategories["all"] = true
+	}
+	for _, cat := range filteredCats {
+		data.SelectedCategories[cat] = true
+	}
+	if !hasSpecificCat && !hasAll {
+		data.SelectedCategories["all"] = true
+	}
+
+	var posts []models.Post
+
+	if hasAll || !hasSpecificCat {
+		data.SelectedCategories = map[string]bool{"all": true}
+		posts, err = models.GetAllPosts()
 		if err != nil {
 			HandleError(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		for i, p := range posts {
-			countlikes, err := models.CountLikeDislikeByPost(p.IdPost, "like")
+	} else {
+		postMap := map[int]models.Post{}
+		for _, catStr := range filteredCats {
+			catId, err := strconv.Atoi(catStr)
+			if err != nil {
+				HandleError(w, "Invalid category id", http.StatusBadRequest)
+				return
+			}
+			catPosts, err := models.GetPostsByCategory(catId)
 			if err != nil {
 				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			posts[i].Likes = countlikes
-
-			Countdislikes, err := models.CountLikeDislikeByPost(p.IdPost, "dislike")
-			if err != nil {
-				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-			posts[i].Dislikes = Countdislikes
-
-			comments, err := models.GetCommentsByPost(p.IdPost)
-			if err != nil {
-				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-			posts[i].Comments = comments
-		}
-
-		data.Posts = posts
-
-	} else if r.Method == http.MethodPost {
-		err := r.ParseForm()
-		if err != nil {
-			HandleError(w, "Bad Request", http.StatusBadRequest)
-			return
-		}
-
-		selectedCats := r.Form["category"]
-		data.SelectedCategories = make(map[string]bool, len(selectedCats))
-		for _, category := range selectedCats {
-			data.SelectedCategories[category] = true
-		}
-
-		isAll := false
-		for _, c := range selectedCats {
-			if c == "all" {
-				isAll = true
-				break
+			for _, p := range catPosts {
+				postMap[p.IdPost] = p
 			}
 		}
-
-		if isAll || len(selectedCats) == 0 {
-			data.SelectedCategories["all"] = true
-			posts, err := models.GetAllPosts()
-			if err != nil {
-				HandleError(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-			data.Posts = posts
-		} else {
-			postMap := map[int]models.Post{}
-			for _, catStr := range selectedCats {
-				catId, err := strconv.Atoi(catStr)
-				if err != nil {
-					HandleError(w, "Invalid category id", http.StatusBadRequest)
-					return
-				}
-				posts, err := models.GetPostsByCategory(catId)
-				if err != nil {
-					HandleError(w, "Internal Server Error", http.StatusInternalServerError)
-					return
-				}
-
-				for _, p := range posts {
-					postMap[p.IdPost] = p
-				}
-			}
-			for _, p := range postMap {
-				data.Posts = append(data.Posts, p)
-			}
+		for _, p := range postMap {
+			posts = append(posts, p)
 		}
 	}
-	data.Action = "/"
+
+	posts, err = GetInfoPosts(w, posts)
+	if err != nil {
+		HandleError(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data.Posts = posts
 	config.RenderTemplate(w, "home.html", data)
 }
