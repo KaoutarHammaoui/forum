@@ -7,18 +7,19 @@ import (
 )
 
 func StaticHandler(w http.ResponseWriter, r *http.Request) {
-
-	referer := r.Header.Get("Referer")
-	if referer == "" {
+	if r.URL.Path == "/static" || r.URL.Path == "/static/" {
 		HandleError(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
 	path := strings.TrimPrefix(r.URL.Path, "/static/")
 	filePath := "./static/" + path
-
-	if _, err := os.Stat(filePath); err != nil {
+	file, err := os.Stat(filePath)
+	if err != nil {
 		HandleError(w, "Not Found", http.StatusNotFound)
+		return
+	}
+	if file.IsDir() {
+		HandleError(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
@@ -26,18 +27,19 @@ func StaticHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UploadsHandler(w http.ResponseWriter, r *http.Request) {
-
-	referer := r.Header.Get("Referer")
-	if referer == "" {
+	if r.URL.Path == "/uploads" || r.URL.Path == "/uploads/" {
 		HandleError(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
 	path := strings.TrimPrefix(r.URL.Path, "/uploads/")
 	filePath := "./uploads/" + path
-
-	if _, err := os.Stat(filePath); err != nil {
+	file, err := os.Stat(filePath)
+	if err != nil {
 		HandleError(w, "Not Found", http.StatusNotFound)
+		return
+	}
+	if file.IsDir() {
+		HandleError(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 

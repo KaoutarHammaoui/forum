@@ -14,14 +14,19 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.Context().Value(middleware.UserIdKey).(int)
+	userID, ok := r.Context().Value(middleware.UserIdKey).(int)
+	if !ok {
+		HandleError(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	postID, err := strconv.Atoi(r.FormValue("post_id"))
 	if err != nil {
-    HandleError(w, "Invalid post ID", http.StatusBadRequest)
-    return
-}
-	content := strings.TrimSpace(r.FormValue("content"))
+		HandleError(w, "Invalid post ID", http.StatusBadRequest)
+		return
+	}
 
+	content := strings.TrimSpace(r.FormValue("content"))
 	if content == "" {
 		http.Redirect(w, r, "/homeUser", 302)
 		return
@@ -33,7 +38,11 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 		Content: content,
 	}
 
-	models.InsertComment(comment)
+	err = models.InsertComment(comment)
+	if err != nil {
+		HandleError(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	http.Redirect(w, r, "/homeUser", 302)
 }
-

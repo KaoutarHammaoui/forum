@@ -45,14 +45,3 @@ func GetUserByEmail(email string) (User, error) {
 	}
 	return payload, nil
 }
-
-
-func GetUserByID(id int) (User, error) {
-	payload := User{}
-	query := "SELECT id, username, email, password, created_at  FROM users  WHERE id = ?"
-	err := database.DB.QueryRow(query, id).Scan(&payload.ID, &payload.Username, &payload.Email, &payload.Password, &payload.CreatedAt)
-	if err != nil {
-		return User{}, err
-	}
-	return payload, nil
-}

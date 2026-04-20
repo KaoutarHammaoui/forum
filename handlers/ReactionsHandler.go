@@ -9,22 +9,35 @@ import (
 )
 
 func ReactPost(w http.ResponseWriter, r *http.Request) {
-		reaction := models.Reaction{}
+	reaction := models.Reaction{}
 	if r.Method != http.MethodPost {
-		HandleError(w, "Method not allowed", 405)
+		HandleError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	userID := r.Context().Value(middleware.UserIdKey).(int)
-	postID, _ := strconv.Atoi(r.FormValue("post_id"))
+	userID, ok := r.Context().Value(middleware.UserIdKey).(int)
+	if !ok {
+		HandleError(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	postID, err := strconv.Atoi(r.FormValue("post_id"))
+	if err != nil {
+		HandleError(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
 	reactionType := r.FormValue("type")
+	if reactionType != "like" && reactionType != "dislike" {
+		HandleError(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
 	reaction.UserID = userID
 	reaction.PostID = postID
 	reaction.Type = reactionType
 	reaction.CommentID = nil
 
-	// Vérifier si une réaction existe déjà
 	existingType, err := models.GetReactionByUser(userID, postID)
 	if err != nil {
 		HandleError(w, "Internal Server Error", 500)
@@ -32,11 +45,17 @@ func ReactPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if existingType == reactionType {
-		// Même réaction → on supprime (toggle off)
-		models.DeleteReaction(userID, postID,reaction.CommentID)
+		err := models.DeleteReaction(userID, postID, reaction.CommentID)
+		if err != nil {
+			HandleError(w, "Internal Server Error", 500)
+			return
+		}
 	} else {
-		// Pas de réaction ou réaction différente → supprimer l'ancienne et insérer
-		models.DeleteReaction(userID, postID,reaction.CommentID)
+		err = models.DeleteReaction(userID, postID, reaction.CommentID)
+		if err != nil {
+			HandleError(w, "Internal Server Error", 500)
+			return
+		}
 		reaction := models.Reaction{
 			UserID:    userID,
 			PostID:    postID,
@@ -58,21 +77,31 @@ func ReactComment(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, "Method not allowed", 405)
 		return
 	}
-	UserID := r.Context().Value(middleware.UserIdKey).(int)
-	postId := r.FormValue("postID")
-	commentId := r.FormValue("commentID")
-	reactionType := r.FormValue("type")
 
-	postID, err := strconv.Atoi(postId)
+	UserID, ok := r.Context().Value(middleware.UserIdKey).(int)
+	if !ok {
+		HandleError(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	postID, err := strconv.Atoi(r.FormValue("postID"))
 	if err != nil {
 		HandleError(w, "error in converting post id to int", http.StatusBadRequest)
 		return
 	}
-	commentID, er := strconv.Atoi(commentId)
-	if er != nil {
+
+	commentID, err := strconv.Atoi(r.FormValue("commentID"))
+	if err != nil {
 		HandleError(w, "invalid comment id", http.StatusBadRequest)
 		return
 	}
+
+	reactionType := r.FormValue("type")
+	if reactionType != "like" && reactionType != "dislike" {
+		HandleError(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
 	commentIDPtr := &commentID
 
 	reactionChecking, err := models.CheckReactionByUser(UserID, postID, commentIDPtr)
@@ -80,6 +109,7 @@ func ReactComment(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, "error during checking reaction", 500)
 		return
 	}
+
 	if reactionChecking == "" {
 		_, err := models.InsertReaction(models.Reaction{
 			UserID:    UserID,
@@ -88,10 +118,9 @@ func ReactComment(w http.ResponseWriter, r *http.Request) {
 			Type:      reactionType,
 		})
 		if err != nil {
-			HandleError(w, "delete error", 500)
+			HandleError(w, "Internal Server Error", 500)
 			return
 		}
-
 	} else if reactionChecking == reactionType {
 		err := models.DeleteReaction(UserID, postID, &commentID)
 		if err != nil {
@@ -104,17 +133,17 @@ func ReactComment(w http.ResponseWriter, r *http.Request) {
 			HandleError(w, "delete error", 500)
 			return
 		}
-		_, er := models.InsertReaction(models.Reaction{
+		_, err = models.InsertReaction(models.Reaction{
 			UserID:    UserID,
 			PostID:    postID,
 			CommentID: commentIDPtr,
 			Type:      reactionType,
 		})
-		if er != nil {
+		if err != nil {
 			HandleError(w, "delete error", 500)
 			return
 		}
 	}
-	http.Redirect(w, r, "/homeUser", 302)
 
+	http.Redirect(w, r, "/homeUser", 302)
 }

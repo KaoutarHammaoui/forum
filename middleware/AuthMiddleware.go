@@ -45,7 +45,6 @@ func GetSession(r *http.Request) (*models.Session, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	session, err := models.GetSessionByToken(cookie.Value)
 	if err != nil {
 		return nil, err

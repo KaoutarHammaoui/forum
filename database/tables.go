@@ -73,6 +73,4 @@ func TableCreation() {
 			log.Fatal(err)
 		}
 	}
-
-	log.Println("Seed data inserted successfully")
 }

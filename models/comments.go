@@ -2,7 +2,6 @@ package models
 
 import (
 	"forum/database"
-	
 	"time"
 )
 
@@ -41,7 +40,6 @@ func GetCommentsByPost(postID int) ([]Comments, error) {
 
 	for rows.Next() {
 		var c Comments
-
 		err := rows.Scan(
 			&c.IdComment,
 			&c.UserId,
@@ -68,3 +66,4 @@ func GetCommentsByPost(postID int) ([]Comments, error) {
 	}
 	return comments, nil
 }
+

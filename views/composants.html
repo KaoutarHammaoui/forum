@@ -1,274 +1,307 @@
 {{define "header"}}
-    <div class="logo"><p>Forum</p></div>
-    <div class="search">
-        <input type="text" placeholder="Search..." />
-    </div>
-    <div class="user">
-        <a href="/login" class="auth-link login-link">Login</a>
-        <a href="/register" class="auth-link register-link">Register</a>
-    </div>
+<div class="logo"><p>Forum</p></div>
+<div class="search">
+  <input type="text" placeholder="Search..." />
+</div>
+<div class="user">
+  <a href="/login" class="auth-link login-link">Login</a>
+  <a href="/register" class="auth-link register-link">Register</a>
+</div>
 {{end}}
+
 {{define "ListCategorie"}}
-                    <form method="POST" action="{{.Action}}" id="clearForm">
-                    <div class="sidebar-top">
-                        <span class="sidebar-label">Filters</span>
-                        <button type="button" class="clear-btn" onclick="clearFilters()">Reset</button>
-                    </div>
-                    <div class="filter-block">
-                        <span class="filter-group-label">Categories</span>
-                        <label class="cat-item">
-                            <input type="checkbox" name="category" value="all" id="cat-all">
-                            <span class="check-box">
-                                <svg class="check-icon" viewBox="0 0 10 10" fill="none">
-                                    <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                            <span class="cat-label all-label">All posts</span>
-                        </label>
-                        <div class="cat-divider"></div>
-                        {{ range .Categories }}
-                        <label class="cat-item">
-                            <input type="checkbox" name="category" value="{{ .IdCat }}">
-                            <span class="check-box">
-                                <svg class="check-icon" viewBox="0 0 10 10" fill="none">
-                                    <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                            <span class="cat-label">{{ .Name }}</span>
-                        </label>
-                        {{ end }}
-                    </div>
-                    <button type="submit" class="apply-btn">Apply filters</button>
-                    </form>
-  
-  
-        <script>
-            function clearFilters() {
-                document.querySelectorAll('#clearForm input[type=checkbox]').forEach(cb => cb.checked = false);
-            }
-        </script>
+<form method="POST" action="{{.Action}}" id="clearForm">
+    <input type="hidden" name="_method" value="DELETE">
+  <div class="sidebar-top">
+    <span class="sidebar-label">Filters</span>
+    <button type="button" class="clear-btn" onclick="clearFilters()">Reset</button>
+  </div>
+  <div class="filter-block">
+    <span class="filter-group-label">Categories</span>
+    <label class="cat-item">
+      <input type="checkbox" name="category" value="all" id="cat-all" />
+      <span class="check-box">
+        <svg class="check-icon" viewBox="0 0 10 10" fill="none">
+          <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="cat-label all-label">All posts</span>
+    </label>
+    <div class="cat-divider"></div>
+    {{ range .Categories }}
+    <label class="cat-item">
+      <input type="checkbox" name="category" value="{{ .IdCat }}" />
+      <span class="check-box">
+        <svg class="check-icon" viewBox="0 0 10 10" fill="none">
+          <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="cat-label">{{ .Name }}</span>
+    </label>
+    {{ end }}
+  </div>
+  <button type="submit" class="apply-btn">Apply filters</button>
+</form>
+
+<script>
+  function clearFilters() {
+    document.querySelectorAll("#clearForm input[type=checkbox]").forEach((cb) => (cb.checked = false));
+  }
+</script>
 {{end}}
+
 {{define "PostContent"}}
 <div class="content-header">
-    <span class="section-label">Posts</span>
+  <span class="section-label">Posts</span>
 </div>
 
 {{ if not .Posts }}
 <div class="no-posts">
-    <p>No posts yet.</p>
+  <p>No posts yet.</p>
 </div>
 {{ else }}
 <div class="posts-list">
-    {{ range .Posts }}
-    <div class="post-card">
+  {{ range .Posts }}
+  <div class="post-card">
 
-        <!-- POST HEADER -->
-        <div class="post-header">
-            <div class="post-avatar">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="8" r="3.5" fill="currentColor" opacity="0.9"/>
-                    <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
-                </svg>
-            </div>
-            <div class="post-meta">
-                <span class="post-author">{{ .UserName }}</span>
-                <span class="post-date">{{ .CreatedAt.Format "02 Jan 2006" }}</span>
-            </div>
-        </div>
+    <!-- POST HEADER -->
+    <div class="post-header">
+      <div class="post-avatar">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="3.5" fill="currentColor" opacity="0.9"/>
+          <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
+        </svg>
+      </div>
+      <div class="post-meta">
+        <span class="post-author">{{ .UserName }}</span>
+        <span class="post-date">{{ .CreatedAt.Format "02 Jan 2006" }}</span>
+      </div>
+    </div>
 
-        <!-- POST IMAGE -->
-        {{ if .Image }}
-        <div class="post-image-container">
-            <img class="post-image" src="/{{ .Image }}" alt="post image">
-        </div>
-        {{ end }}
-
-        <!-- POST BODY -->
-        <div class="post-body">
-            <h3 class="post-title">{{ .Title }}</h3>
-
-            <input type="checkbox" class="excerpt-toggle" id="excerpt-{{ .IdPost }}">
-            <p class="post-excerpt">{{ .Content }}</p>
-            <label class="see-more-btn" for="excerpt-{{ .IdPost }}">
-                <span class="label-more">Voir plus</span>
-                <span class="label-less">Voir moins</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"/>
-                </svg>
-            </label>
-        </div>
-
-        <!-- REACTIONS + COMMENTS TOGGLE -->
-        <div class="post-reactions">
-            {{ $url    := "" }}
-            {{ $method := "" }}
-
-            {{ if eq $.Action "/" }}
-                {{ $url = "/login" }}    {{ $method = "get" }}
-            {{ else if eq $.Action "/homeUser" }}
-                {{ $url = "/reactions" }}    {{ $method = "post" }}
-            {{ end }}
-
-            <form action="{{ $url }}" method="{{ $method }}" class="post-reactions">
-                <input type="hidden" name="post_id" value="{{ .IdPost }}">
-                <input type="hidden" name="redirect" value="{{ $.Action}}">
-
-                <button type="submit"  name="type" value="like" class="reaction-btn like-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                    <span class="reaction-label">Like</span>
-                    <span class="reaction-count">{{ .Likes }}</span>
-                </button>
-
-                <button type="submit" name="type" value="dislike" class="reaction-btn dislike-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
-                        <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
-                    </svg>
-                    <span class="reaction-label">Dislike</span>
-                    <span class="reaction-count">{{ .Dislikes }}</span>
-                </button>
-            </form>
-            <!-- CHECKBOX COMMENTS TOGGLE (CSS-only) -->
-            <input type="checkbox" class="comment-toggle" id="comments-{{ .IdPost }}">
-            <label class="comment-toggle-btn" for="comments-{{ .IdPost }}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span class="label-more">Comments</span>
-                <span class="label-less">Fermer</span>
-            </label>
-
-            <!-- COMMENTS SECTION (contrôlée par la checkbox) -->
-            <div class="comments-section">
-                <div class="comments-inner">
-
-                    <div class="comments-header">
-                        <h4 class="comments-title">Comments</h4>
-                        <span class="comments-count" data-post-id="{{ .IdPost }}">{{len .Comments}}</span>
-                    </div>
-                    <!-- Écrire un commentaire -->
-                     {{if $.IsLogged}}
-                     <form action="/SubmitComment" method="post">
-                        <input type="hidden" name="post_id" value="{{.IdPost}}">
-                    <div class="write-comment">
-                    <div class="post-avatar">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="8" r="3.5" fill="currentColor" opacity="0.9"/>
-                            <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
-                        </svg>
-                                
-                    </div>                        <div class="comment-input-wrap">
-                            <textarea name="content" class="comment-input" placeholder="Écrire un commentaire..." rows="2"></textarea>
-                            <div class="comment-actions">
-                                <button class="submit-comment-btn" data-post-id="{{ .IdPost }}">Publier</button>
-                            </div>
-                        </div>
-                    </div>
-                    </form>
-                    {{else}}
-                        <p><a href="/login" class="login-to-comment">login</a> to comment :></p>
-                    {{end}}    
-                    <!-- Liste des commentaires -->
-                   <div class="comments-list" data-post-id="{{ .IdPost }}">
-                    {{ if not .Comments }}
-                        <div class="no-comments">Soyez le premier à commenter...</div>
-                    {{ end }}
-
-                    {{ range .Comments }}
-                        <div class="comment-item">
-                            <div class="post-avatar">
-                                {{ slice .Username 0 1 }}
-                            </div>
-                            <div class="comment-body">
-                                <div class="comment-top">
-                                    <span class="comment-author">@{{ .Username }}</span>
-                                </div>
-                                <p class="comment-text">{{ .Content }}</p>
-                            </div>
-                        </div>
-                    {{ end }}
-                </div>
-                </div>
-            </div>
-        </div>
-
+    <!-- POST IMAGE -->
+    {{ if .Image }}
+    <div class="post-image-container">
+      <img class="post-image" src="/{{ .Image }}" alt="post image">
     </div>
     {{ end }}
+
+    <!-- POST BODY -->
+    <div class="post-body">
+      <h3 class="post-title">{{ .Title }}</h3>
+      <input type="checkbox" class="excerpt-toggle" id="excerpt-{{ .IdPost }}">
+      <p class="post-excerpt">{{ .Content }}</p>
+      <label class="see-more-btn" for="excerpt-{{ .IdPost }}">
+        <span class="label-more">Voir plus</span>
+        <span class="label-less">Voir moins</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </label>
+    </div>
+
+    <!-- REACTIONS + COMMENTS TOGGLE -->
+    <div class="post-reactions">
+      {{ $url    := "" }}
+      {{ $method := "" }}
+      {{ if eq $.Action "/" }}
+        {{ $url = "/login" }} {{ $method = "get" }}
+      {{ else if eq $.Action "/homeUser" }}
+        {{ $url = "/reactions" }} {{ $method = "post" }}
+      {{ end }}
+
+      <form action="{{ $url }}" method="{{ $method }}" class="post-reactions">
+        <input type="hidden" name="post_id" value="{{ .IdPost }}">
+        <input type="hidden" name="redirect" value="{{ $.Action }}">
+
+        <button type="submit" name="type" value="like" class="reaction-btn like-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <span class="reaction-label">Like</span>
+          <span class="reaction-count">{{ .Likes }}</span>
+        </button>
+
+        <button type="submit" name="type" value="dislike" class="reaction-btn dislike-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+            <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+          </svg>
+          <span class="reaction-label">Dislike</span>
+          <span class="reaction-count">{{ .Dislikes }}</span>
+        </button>
+      </form>
+
+      <!-- CHECKBOX COMMENTS TOGGLE (CSS-only) -->
+      <input type="checkbox" class="comment-toggle" id="comments-{{ .IdPost }}">
+      <label class="comment-toggle-btn" for="comments-{{ .IdPost }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span class="label-more">Comments</span>
+        <span class="label-less">Fermer</span>
+      </label>
+
+      <!-- COMMENTS SECTION -->
+      <div class="comments-section">
+        <div class="comments-inner">
+
+          <div class="comments-header">
+            <h4 class="comments-title">Comments</h4>
+            <span class="comments-count" data-post-id="{{ .IdPost }}">{{len .Comments}}</span>
+          </div>
+
+          <!-- Write a comment -->
+          {{if $.IsLogged}}
+          <form action="/SubmitComment" method="post">
+            <input type="hidden" name="post_id" value="{{.IdPost}}">
+            <div class="write-comment">
+              <div class="post-avatar">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="8" r="3.5" fill="currentColor" opacity="0.9"/>
+                  <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.75"/>
+                </svg>
+              </div>
+              <div class="comment-input-wrap">
+                <textarea name="content" class="comment-input" placeholder="Écrire un commentaire..." rows="2"></textarea>
+                <div class="comment-actions">
+                  <button class="submit-comment-btn" data-post-id="{{ .IdPost }}">Publier</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          {{else}}
+          <p><a href="/login" class="login-to-comment">login</a> to comment :></p>
+          {{end}}
+
+          <!-- Comments list -->
+          <div class="comments-list" data-post-id="{{ .IdPost }}">
+            {{ if not .Comments }}
+            <div class="no-comments">Soyez le premier à commenter...</div>
+            {{ end }}
+
+            {{ range .Comments }}
+            <div class="comment-item">
+              <div class="comment-body">
+                <div class="comment-top">
+                  <span class="comment-author">@{{ .Username }}</span>
+                </div>
+                <p class="comment-text">{{ .Content }}</p>
+              </div>
+              <div style="display:flex; gap:16px; margin-top:4px;">
+                {{if $.IsLogged}}
+                <form action="/reactOnAComment" method="post">
+                  <input type="hidden" name="postID" value="{{.PostId}}">
+                  <input type="hidden" name="commentID" value="{{.IdComment}}">
+                  <input type="hidden" name="type" value="like">
+                  <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button style="background:none; border:none; cursor:pointer; font-size:16px;">♡</button>
+                    <span style="font-size:10px; color:gray;">{{.Likes}}</span>
+                  </div>
+                </form>
+                <form action="/reactOnAComment" method="post">
+                  <input type="hidden" name="postID" value="{{.PostId}}">
+                  <input type="hidden" name="commentID" value="{{.IdComment}}">
+                  <input type="hidden" name="type" value="dislike">
+                  <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button style="background:none; border:none; cursor:pointer; font-size:16px;">↓</button>
+                    <span style="font-size:10px; color:gray;">{{.Dislikes}}</span>
+                  </div>
+                </form>
+                {{else}}
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                  <a href="/login" style="font-size:16px; text-decoration:none;">♡</a>
+                  <span style="font-size:10px; color:gray;">{{.Likes}}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                  <a href="/login" style="font-size:16px; text-decoration:none;">↓</a>
+                  <span style="font-size:10px; color:gray;">{{.Dislikes}}</span>
+                </div>
+                {{end}}
+              </div>
+            </div>
+            {{end}}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  {{ end }}
 </div>
 {{ end }}
 {{end}}
+
 {{define "CreatePost"}}
 {{if .Error}}
-    <input type="checkbox" class="excerpt-toggle" id="form-more-toggle" checked>
+<input type="checkbox" class="excerpt-toggle" id="form-more-toggle" checked />
 {{else}}
-    <input type="checkbox" class="excerpt-toggle" id="form-more-toggle">
+<input type="checkbox" class="excerpt-toggle" id="form-more-toggle" />
 {{end}}
 
 <form action="/createPost" method="POST" enctype="multipart/form-data">
-    <p class="form-subtitle">New publication</p><br>
+  <p class="form-subtitle" >New publication</p>
+  <br />
 
-    {{if .Error}}
-        <div class="form-error">{{.Error}}</div>
-    {{end}}
+  {{if .Error}}
+  <div class="form-error">{{.Error}}</div>
+  {{end}}
+  <div class="field">
+    <label for="post-title">Title</label>
+    <input type="text" id="post-title" name="title" placeholder="Enter post title..." />
+  </div>
+
+  <label for="form-more-toggle" class="see-more-btn">
+    <span class="label-more">More options</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </label>
+
+  <div class="form-extra">
     <div class="field">
-        <label for="post-title">Title</label>
-        <input type="text" id="post-title" name="title" placeholder="Enter post title..."  />
+      <label for="post-content">Content</label>
+      <textarea id="post-content" name="content" placeholder="Write your post content here..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Image</label>
+      <div class="file-zone" id="drop-zone">
+        <input type="file" name="image" accept="image/*" id="file-input" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <polyline points="21 15 16 10 5 21" />
+        </svg>
+        <p>Click to upload or drag &amp; drop</p>
+        <p class="file-hint">PNG, JPG — max 5MB</p>
+        <p class="file-name" id="file-name"></p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Categories</label>
+      <div class="categories-grid">
+        {{range .Categories}}
+        <label class="category-checkbox">
+          <input type="checkbox" name="categories" value="{{.IdCat}}" />
+          <span>{{.Name}}</span>
+        </label>
+        {{end}}
+      </div>
     </div>
 
     <label for="form-more-toggle" class="see-more-btn">
-        <span class="label-more">More options</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="6 9 12 15 18 9"/>
-        </svg>
+      <span class="label-lessz">Less options</span>
+      <svg style="transform: rotate(180deg)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
     </label>
+  </div>
 
-    <div class="form-extra">
-        <div class="field">
-            <label for="post-content">Content</label>
-            <textarea id="post-content" name="content" placeholder="Write your post content here..." ></textarea>
-        </div>
-
-        <div class="field">
-            <label>Image</label>
-            <div class="file-zone" id="drop-zone">
-                <input type="file" name="image" accept="image/*" id="file-input" />
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                </svg>
-                <p>Click to upload or drag &amp; drop</p>
-                <p class="file-hint">PNG, JPG — max 5MB</p>
-                <p class="file-name" id="file-name"></p>
-            </div>
-        </div>
-
-        <div class="field">
-            <label>Categories</label>
-            <div class="categories-grid">
-                {{range .Categories}}
-                    <label class="category-checkbox">
-                        <input type="checkbox" name="categories" value="{{.IdCat}}" />
-                        <span>{{.Name}}</span>
-                    </label>
-                {{end}}
-            </div>
-        </div>
-        <label for="form-more-toggle" class="see-more-btn">
-            <span class="label-lessz">Less options</span>
-            <svg style="transform:rotate(180deg)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="6 9 12 15 18 9"/>
-            </svg>
-        </label>
-    </div>
-
-    <div class="actions">
-            <button type="reset" class="btn-cancel">Cancel</button>
-            <button type="submit" class="btn-submit">Publish post</button>
-    </div>
-
-
+  <div class="actions">
+    <button type="reset" class="btn-cancel">Cancel</button>
+    <button type="submit" class="btn-submit">Publish post</button>
+  </div>
 </form>
 {{end}}
