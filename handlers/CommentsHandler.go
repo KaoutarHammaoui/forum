@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"forum/middleware"
-	"forum/models"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"forum/middleware"
+	"forum/models"
 )
 
 func AddComment(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +41,7 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 
 	err = models.InsertComment(comment)
 	if err != nil {
-		HandleError(w, "Internal Server Error", http.StatusInternalServerError)
+		HandleError(w, "Bad request", 401)
 		return
 	}
 
