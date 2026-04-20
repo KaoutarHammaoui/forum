@@ -34,7 +34,6 @@ func GetSessionByToken(token string) (Session, error) {
 	if err != nil {
 		return Session{}, err
 	}
-
 	if session.ExpiresAt.Before(time.Now()) {
 		DeleteSessionByToken(token)
 		return Session{}, errors.New("session expirée")
@@ -50,4 +49,8 @@ func DeleteSessionByToken(token string) error {
 		return err
 	}
 	return nil
+}
+func DeleteSessionsByUserID(userID int) error {
+	_, err := database.DB.Exec("DELETE FROM session WHERE user_id = ?", userID)
+	return err
 }

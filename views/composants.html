@@ -1,8 +1,6 @@
 {{define "header"}}
 <div class="logo"><p>Forum</p></div>
-<div class="search">
-  <input type="text" placeholder="Search..." />
-</div>
+
 <div class="user">
   <a href="/login" class="auth-link login-link">Login</a>
   <a href="/register" class="auth-link register-link">Register</a>
@@ -11,6 +9,7 @@
 
 {{define "ListCategorie"}}
 <form method="POST" action="{{.Action}}" id="clearForm">
+    <input type="hidden" name="_method" value="DELETE">
   <div class="sidebar-top">
     <span class="sidebar-label">Filters</span>
     <button type="button" class="clear-btn" onclick="clearFilters()">Reset</button>
@@ -88,7 +87,7 @@
     <div class="post-body">
       <h3 class="post-title">{{ .Title }}</h3>
       <input type="checkbox" class="excerpt-toggle" id="excerpt-{{ .IdPost }}">
-      <p class="post-excerpt">{{ .Content }}</p>
+      <p class="post-excerpt" style="white-space: pre-line;" >{{ .Content }}</p>
       <label class="see-more-btn" for="excerpt-{{ .IdPost }}">
         <span class="label-more">Voir plus</span>
         <span class="label-less">Voir moins</span>
@@ -184,7 +183,7 @@
                 <div class="comment-top">
                   <span class="comment-author">@{{ .Username }}</span>
                 </div>
-                <p class="comment-text">{{ .Content }}</p>
+                <p class="comment-text" style="white-space: pre-line;" >{{ .Content }}</p>
               </div>
               <div style="display:flex; gap:16px; margin-top:4px;">
                 {{if $.IsLogged}}
@@ -239,7 +238,7 @@
 {{end}}
 
 <form action="/createPost" method="POST" enctype="multipart/form-data">
-  <p class="form-subtitle">New publication</p>
+  <p class="form-subtitle" >New publication</p>
   <br />
 
   {{if .Error}}

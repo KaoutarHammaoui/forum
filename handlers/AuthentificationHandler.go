@@ -1,19 +1,24 @@
 package handlers
 
 import (
+	"forum/config"
+	"forum/middleware"
+	"forum/models"
 	"net/http"
 	"strings"
 	"time"
-
-	"forum/config"
-	"forum/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 func LoginH(w http.ResponseWriter, r *http.Request) {
+	session, err := middleware.GetSession(r)
+	if err == nil && session != nil {
+		http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
+		return
+	}
 	if r.Method != http.MethodGet {
-		HandleError(w, "invalid request method", http.StatusMethodNotAllowed)
+		HandleError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	data := Login{}
@@ -30,13 +35,12 @@ func LoginH(w http.ResponseWriter, r *http.Request) {
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		HandleError(w, "", http.StatusMethodNotAllowed)
+		HandleError(w, "METHOD NOT ALLOWED", http.StatusMethodNotAllowed)
 		return
-
 	}
+
 	email := strings.TrimSpace(r.FormValue("email"))
 	password := r.FormValue("password")
-
 	data := Login{Email: email}
 
 	user, err := models.GetUserByEmail(email)
@@ -46,17 +50,21 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login?error=email", http.StatusSeeOther)
 		return
 	}
-
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		data.PasswordError = "incorrect password"
 		data.HasErrors = true
 		http.Redirect(w, r, "/login?error=password", http.StatusSeeOther)
 		return
 	}
-	models.DeleteSessionsByUserID(user.ID)
+
+	err = models.DeleteSessionsByUserID(user.ID) //Eviter les connexions actives -un seul login pour un utilisateur-
+	if err != nil {
+		HandleError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	token, err := models.InsertSession(user.ID)
 	if err != nil {
-		HandleError(w, "wrong", http.StatusInternalServerError)
+		HandleError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -1,9 +1,7 @@
 package models
 
 import (
-	"log"
 	"time"
-
 	"forum/database"
 )
 
@@ -11,7 +9,7 @@ type Post struct {
 	IdPost    int
 	Title     string
 	Content   string
-	UserId    int 
+	UserId    int
 	Image     string
 	UserName  string
 	Comments  []Comments
@@ -62,16 +60,6 @@ func GetAllPosts() ([]Post, error) {
 	return posts, nil
 }
 
-func GetPostById(id int) (Post, error) {
-	post := Post{}
-	query := "SELECT id, title, content, user_id, image, created_at  FROM posts WHERE id = ?"
-	err := database.DB.QueryRow(query, id).Scan(&post.IdPost, &post.Title, &post.Content, &post.UserId, &post.Image, &post.CreatedAt)
-	if err != nil {
-		return Post{}, err
-	}
-	return post, nil
-}
-
 func GetPostsByCategory(idcat int) ([]Post, error) {
 	posts := []Post{}
 	query := `SELECT p.id, p.title, p.content, p.user_id, p.image, p.created_at, u.username
@@ -100,27 +88,4 @@ func GetPostsByCategory(idcat int) ([]Post, error) {
 	}
 
 	return posts, nil
-}
-
-func FetchComment(postId int) ([]Comments, error) {
-	comments := []Comments{}
-	query := `SELECT comments.id, comments.user_id, comments.post_id,comments.content,comments.created_at,users.username
-	FROM comments INNER JOIN users ON comments.user_id=users.id
-			WHERE comments.post_id=? `
-
-	rows, err := database.DB.Query(query, postId)
-	if err != nil {
-		log.Println("FetchComment error:", err)
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		c := Comments{}
-		err := rows.Scan(&c.IdComment, &c.UserId, &c.PostId, &c.Content, &c.CreatedAt, &c.Username)
-		if err != nil {
-			return nil, err
-		}
-		comments = append(comments, c)
-	}
-	return comments, nil
 }

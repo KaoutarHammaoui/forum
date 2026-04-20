@@ -38,6 +38,16 @@ func CheckReactionByUser(userId int,postID int,commentID *int) (string,error) {
 	}
 	return reactionType,nil
 }
+func GetReactionByUser(userId, postId int) (string, error) {
+	reactionType := ""
+	query := "SELECT type FROM likes_dislikes WHERE user_id = ? AND post_id = ? LIMIT 1"
+	err := database.DB.QueryRow(query, userId, postId).Scan(&reactionType)
+	if err != nil {
+		return "", nil 
+	}
+	return reactionType, nil
+}
+
 func CountLikeDislikeByPost(postId int, Type string) (int, error) {
 	count := 0
 	query := "SELECT COUNT(*) FROM likes_dislikes WHERE post_id = ? AND type = ?"
@@ -56,13 +66,4 @@ func CountLikesByComments(commentID int,post_id int,Type string)(int,error){
 		return 0,err
 	}
 	return count,nil 
-}
-func GetReactionByUser(userId, postId int) (string, error) {
-	reactionType := ""
-	query := "SELECT type FROM likes_dislikes WHERE user_id = ? AND post_id = ? LIMIT 1"
-	err := database.DB.QueryRow(query, userId, postId).Scan(&reactionType)
-	if err != nil {
-		return "", nil // pas de réaction trouvée
-	}
-	return reactionType, nil
 }

@@ -24,7 +24,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(10 << 20); err != nil {
+	if err := r.ParseMultipartForm(5 << 20); err != nil {
 		renderCreateError(w, r, "Invalid form data.")
 		return
 	}
@@ -33,7 +33,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 	content := strings.TrimSpace(r.FormValue("content"))
 	categories := r.Form["categories"]
 
-	// Title
+	// Title validation
 	if title == "" {
 		renderCreateError(w, r, "Title is required.")
 		return
@@ -43,7 +43,7 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Content
+	// Content validation
 	if content == "" {
 		renderCreateError(w, r, "Content is required.")
 		return
@@ -53,35 +53,37 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Categories
+	// Categories validation
 	if len(categories) == 0 {
 		renderCreateError(w, r, "Please select at least one category.")
 		return
 	}
 
-	// Image
+	// Image (OPTIONAL)
+	var imagePath string
+
 	file, handler, err := r.FormFile("image")
-	if err != nil {
-		renderCreateError(w, r, "An image is required.")
-		return
-	}
-	defer file.Close()
+	if err == nil {
+		defer file.Close()
 
-	ext := strings.ToLower(filepath.Ext(handler.Filename))
-	if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
-		renderCreateError(w, r, "Image must be a JPG or PNG file.")
-		return
-	}
+		ext := strings.ToLower(filepath.Ext(handler.Filename))
+		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
+			renderCreateError(w, r, "Image must be a JPG, JPEG, or PNG file.")
+			return
+		}
 
-	if handler.Size > 5<<20 {
-		renderCreateError(w, r, "Image must not exceed 5 MB.")
-		return
-	}
+		if handler.Size > 5<<20 {
+			renderCreateError(w, r, "Image must not exceed 5 MB.")
+			return
+		}
 
-	// Save image
-	imagePath, err := saveUploadedFile(file, handler.Filename, ext)
-	if err != nil {
-		renderCreateError(w, r, "Failed to save image. Please try again.")
+		imagePath, err = saveUploadedFile(file, handler.Filename, ext)
+		if err != nil {
+			renderCreateError(w, r, "Failed to save image. Please try again.")
+			return
+		}
+	} else if err != http.ErrMissingFile {
+		renderCreateError(w, r, "Error reading image.")
 		return
 	}
 
@@ -97,14 +99,16 @@ func handleCreatePost(w http.ResponseWriter, r *http.Request) {
 		Title:   title,
 		Content: content,
 		UserId:  userID,
-		Image:   imagePath,
+		Image:   imagePath, // empty if no image
 	}
+
 	postID, err := models.InsertPost(post)
 	if err != nil {
 		renderCreateError(w, r, "Failed to create post. Please try again.")
 		return
 	}
 
+	// Attach categories
 	for _, catIDStr := range categories {
 		catID, err := strconv.Atoi(catIDStr)
 		if err != nil {
@@ -143,6 +147,7 @@ func saveUploadedFile(file multipart.File, originalName, ext string) (string, er
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		return "", err
 	}
+
 	uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(originalName))
 	dst := filepath.Join(uploadDir, uniqueName)
 
@@ -155,5 +160,6 @@ func saveUploadedFile(file multipart.File, originalName, ext string) (string, er
 	if _, err := io.Copy(out, file); err != nil {
 		return "", err
 	}
+
 	return strings.ReplaceAll(dst, "\\", "/"), nil
 }
