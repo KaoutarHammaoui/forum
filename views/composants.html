@@ -177,7 +177,16 @@
                 </svg>
               </div>
               <div class="comment-input-wrap">
-                <textarea name="content" class="comment-input" placeholder="Écrire un commentaire..." rows="2" ></textarea>
+                <style>
+                    @keyframes fadeOut{
+                        from {opacity: 1;}
+                        to {opacity: 0;}
+                    }
+                </style>
+                <textarea name="Commentcontent" class="comment-input" placeholder="Écrire un commentaire..." rows="2" ></textarea>
+                {{if and $.CommentError (eq .IdPost $.ErrorPostID)}}
+                    <p style="color: red;animation: fadeOut 1s ease 30s forwards;">{{$.CommentError}}</p>
+                {{end}}
                 <div class="comment-actions">
                   <button class="submit-comment-btn" data-post-id="{{ .IdPost }}">Publier</button>
                 </div>

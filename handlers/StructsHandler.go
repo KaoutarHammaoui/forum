@@ -18,6 +18,8 @@ type Data struct {
 	SelectedCategories map[string]bool
 	FilterLikes        bool
 	FilterMyPosts      bool
+	CommentError string
+	ErrorPostID int
 }
 
 type RegistrationData struct {
