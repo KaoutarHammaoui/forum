@@ -2,11 +2,11 @@ package models
 
 import (
 	"errors"
-	
+
 	"forum/database"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type Session struct {
@@ -18,12 +18,15 @@ type Session struct {
 
 func InsertSession(idUser int) (string, error) {
 	query := "INSERT INTO session (user_id, token, expires_at) VALUES (?, ?, ?)"
-	token := uuid.New().String()
-	expires_at := time.Now().Add(time.Hour)
-	_, err := database.DB.Exec(query, idUser, token, expires_at)
+
+	token := uuid.Must(uuid.NewV4()).String()
+	expiresAt := time.Now().Add(time.Hour)
+
+	_, err := database.DB.Exec(query, idUser, token, expiresAt)
 	if err != nil {
 		return "", err
 	}
+
 	return token, nil
 }
 

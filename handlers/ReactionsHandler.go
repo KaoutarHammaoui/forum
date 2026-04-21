@@ -64,7 +64,7 @@ func ReactPost(w http.ResponseWriter, r *http.Request) {
 		}
 		_, err := models.InsertReaction(reaction)
 		if err != nil {
-			HandleError(w, "Internal Server Error", 500)
+			HandleError(w, "Internal Server Error", 401)
 			return
 		}
 	}
