@@ -13,7 +13,7 @@ func Route() {
 	http.HandleFunc("/static/", handlers.StaticHandler)
 
 	// Home Route
-http.Handle("/", middleware.RateLimiter(http.HandlerFunc(handlers.Home)))	// Register Routes
+	http.Handle("/", middleware.RateLimiter(http.HandlerFunc(handlers.Home)))	// Register Routes
 	http.HandleFunc("/register", handlers.RegisterHandler)
 	http.Handle("/do-register", middleware.RateLimiter(http.HandlerFunc(handlers.DoRegisterHandler)))
 

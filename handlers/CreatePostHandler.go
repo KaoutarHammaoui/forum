@@ -19,19 +19,14 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
 
 	err := r.ParseForm()
 	if err != nil {
 		fmt.Println("Parse error:", err)
 	}
-
-	fmt.Println("FULL FORM:", r.Form)
-	fmt.Println("TITLE:", r.FormValue("title"))
 	title := strings.TrimSpace(r.FormValue("title"))
 	content := strings.TrimSpace(r.FormValue("content"))
 	categories := r.Form["categories"]
-	fmt.Println("test", title)
 	// Title validation
 	if title == "" {
 		renderCreateError(w, r, "Title is required.")
