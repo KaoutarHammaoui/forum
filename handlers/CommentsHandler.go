@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -27,9 +28,14 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content := strings.TrimSpace(r.FormValue("content"))
+	content := strings.TrimSpace(r.FormValue("Commentcontent"))
 	if content == "" {
-		http.Redirect(w, r, "/homeUser", 302)
+		http.SetCookie(w,&http.Cookie{
+			Name: "comment_error",
+			Value: fmt.Sprintf("%d",postID),
+			Path: "/",
+		})
+		http.Redirect(w, r, "/homeUser", http.StatusSeeOther)
 		return
 	}
 

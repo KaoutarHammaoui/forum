@@ -111,6 +111,21 @@ func HomeUser(w http.ResponseWriter, r *http.Request) {
 
 	data.Posts = posts
 	data.Action = "/homeUser"
+	cookie,err:=r.Cookie("comment_error")
+	if err==nil{
+		postID,err:=strconv.Atoi(cookie.Value)
+		if err==nil{
+			data.CommentError="comment cannot be empty"
+			data.ErrorPostID=postID
+		}
+		http.SetCookie(w,&http.Cookie{
+			Name: "comment_error",
+			Value: "",
+			Path: "/",
+			MaxAge: -1,
+			HttpOnly: true,
+		})
+	}
 	config.RenderTemplate(w, "homeUser.html", data)
 }
 
