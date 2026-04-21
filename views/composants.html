@@ -16,7 +16,7 @@
   <div class="filter-block">
     <span class="filter-group-label">Categories</span>
     <label class="cat-item">
-      <input type="checkbox" name="category" value="all" id="cat-all" {{if index .SelectedCategories "all"}}checked{{end}} />
+      <input type="checkbox" name="category" value="all" id="cat-all" />
       <span class="check-box">
         <svg class="check-icon" viewBox="0 0 10 10" fill="none">
           <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -27,7 +27,7 @@
     <div class="cat-divider"></div>
     {{ range .Categories }}
     <label class="cat-item">
-      <input type="checkbox" name="category" value="{{ .IdCat }}" {{if index $.SelectedCategories (printf "%d" .IdCat)}}checked{{end}} />
+      <input type="checkbox" name="category" value="{{ .IdCat }}"  />
       <span class="check-box">
         <svg class="check-icon" viewBox="0 0 10 10" fill="none">
           <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -41,7 +41,7 @@
   <div class="filter-block">
     <span class="filter-group-label">Activity</span>
     <label class="cat-item">
-      <input type="checkbox" name="activity" value="liked" {{if .FilterLikes}}checked{{end}} />
+      <input type="checkbox" name="activity" value="liked"  />
       <span class="check-box">
         <svg class="check-icon" viewBox="0 0 10 10" fill="none">
           <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -50,7 +50,7 @@
       <span class="cat-label">Liked posts</span>
     </label>
     <label class="cat-item">
-      <input type="checkbox" name="activity" value="owned" {{if .FilterMyPosts}}checked{{end}} />
+      <input type="checkbox" name="activity" value="owned"  />
       <span class="check-box">
         <svg class="check-icon" viewBox="0 0 10 10" fill="none">
           <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
