@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"net/http"
@@ -49,10 +50,18 @@ func RenderTemplate(w http.ResponseWriter, name string, data any) {
 		http.Error(w, "Template not found", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	err := tmpl.ExecuteTemplate(w, name, data)
+
+	var buf bytes.Buffer
+
+	// Execute template into buffer first
+	err := tmpl.ExecuteTemplate(&buf, name, data)
 	if err != nil {
 		log.Printf("Error executing template %s: %v\n", name, err)
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		return
 	}
+
+	// Only write to response if everything is OK
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	buf.WriteTo(w)
 }
