@@ -2,9 +2,9 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"forum/database"
-	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -52,6 +52,7 @@ func DeleteSessionByToken(token string) error {
 	}
 	return nil
 }
+
 func DeleteSessionsByUserID(userID int) error {
 	_, err := database.DB.Exec("DELETE FROM session WHERE user_id = ?", userID)
 	return err
